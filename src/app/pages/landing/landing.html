@@ -1,0 +1,75 @@
+<header class="site-header">
+  <div class="container site-header__inner">
+    <a routerLink="/" class="brand">Thesis Repository</a>
+    <nav class="nav">
+      <a routerLink="/search" class="nav__link">Browse</a>
+      <a routerLink="/search" class="nav__link">About</a>
+      <a routerLink="/login" class="btn btn--ghost nav__cta">Admin login</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="hero container">
+    <h1 class="hero__title">Search engine research, in one place</h1>
+    <p class="hero__text">
+      A curated collection of theses and papers on information retrieval, ranking,
+      and search engine architecture.
+    </p>
+
+    <form class="search-bar" role="search">
+      <input
+        class="input search-bar__input"
+        type="search"
+        placeholder="Search by title, author, or keyword"
+        aria-label="Search theses"
+      />
+      <button class="btn search-bar__button" type="submit">Search</button>
+    </form>
+
+    <p class="hero__hint">Trending: ranking algorithms, vector search, index compression</p>
+  </section>
+
+  <section class="container features">
+    <article class="feature">
+      <h2 class="feature__title">Curated entries</h2>
+      <p class="feature__text">
+        Every record is reviewed and tagged by topic, year, and institution.
+      </p>
+    </article>
+    <article class="feature">
+      <h2 class="feature__title">Structured filters</h2>
+      <p class="feature__text">
+        Narrow results by publication year, author, methodology, or language.
+      </p>
+    </article>
+    <article class="feature">
+      <h2 class="feature__title">Open access</h2>
+      <p class="feature__text">
+        Direct links to full texts and citation details wherever available.
+      </p>
+    </article>
+  </section>
+
+  <section class="container stats">
+    <div class="stat">
+      <span class="stat__value">0</span>
+      <span class="stat__label">Records</span>
+    </div>
+    <div class="stat">
+      <span class="stat__value">0</span>
+      <span class="stat__label">Topics</span>
+    </div>
+    <div class="stat">
+      <span class="stat__value">0</span>
+      <span class="stat__label">Institutions</span>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="container site-footer__inner">
+    <span class="site-footer__copy">© 2026 Thesis Repository</span>
+    <a routerLink="/login" class="site-footer__link">Administrator</a>
+  </div>
+</footer>
