@@ -1,0 +1,267 @@
+.container {
+  width: 100%;
+  max-width: var(--content-width);
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.site-header {
+  border-bottom: 1px solid var(--border);
+}
+
+.site-header__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+}
+
+.brand {
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.nav__link {
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.nav__link:hover {
+  color: var(--text);
+}
+
+.nav__link--active {
+  color: var(--text);
+}
+
+.nav__cta {
+  height: 36px;
+  padding: 0 14px;
+  font-size: 13px;
+}
+
+.page {
+  padding-top: 40px;
+  padding-bottom: 64px;
+}
+
+.search-bar {
+  display: flex;
+  gap: 8px;
+  max-width: 720px;
+  margin-bottom: 40px;
+}
+
+.search-bar__input {
+  flex: 1;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 48px;
+  align-items: start;
+}
+
+.filters {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  padding-top: 4px;
+}
+
+.filters__group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.filters__title {
+  margin: 0 0 2px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.checkbox input {
+  width: 15px;
+  height: 15px;
+  margin: 0;
+  accent-color: var(--text);
+}
+
+.results__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.results__count {
+  margin: 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.sort {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.sort__select {
+  height: 32px;
+  padding: 0 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg);
+  color: var(--text);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.sort__select:focus {
+  outline: none;
+  border-color: var(--text);
+}
+
+.result-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.result {
+  padding: 24px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.result__title {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.result__title:hover {
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.result__meta {
+  margin: 6px 0 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.result__abstract {
+  margin: 10px 0 0;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.result__actions {
+  display: flex;
+  gap: 16px;
+  margin-top: 12px;
+}
+
+.result__link {
+  font-size: 13px;
+  font-weight: 500;
+  border-bottom: 1px solid var(--border);
+}
+
+.result__link:hover {
+  border-color: var(--text);
+}
+
+.pagination {
+  display: flex;
+  gap: 6px;
+  margin-top: 32px;
+}
+
+.pagination__item {
+  min-width: 36px;
+  height: 36px;
+  padding: 0 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg);
+  color: var(--text);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.pagination__item:hover:not(:disabled) {
+  border-color: var(--text);
+}
+
+.pagination__item--active {
+  background: var(--text);
+  border-color: var(--text);
+  color: #ffffff;
+}
+
+.pagination__item:disabled {
+  color: var(--muted);
+  cursor: default;
+}
+
+.site-footer {
+  border-top: 1px solid var(--border);
+}
+
+.site-footer__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.site-footer__link:hover {
+  color: var(--text);
+}
+
+@media (max-width: 860px) {
+  .layout {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+
+  .filters {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 24px 40px;
+  }
+
+  .nav__link {
+    display: none;
+  }
+}

@@ -1,0 +1,36 @@
+<main class="auth">
+  <div class="auth__inner">
+    <a routerLink="/" class="brand">Thesis Repository</a>
+
+    <div class="card">
+      <h1 class="card__title">Administrator sign in</h1>
+      <p class="card__text">Manage records, uploads, and moderation.</p>
+
+      <form class="form">
+        <label class="field">
+          <span class="field__label">Email</span>
+          <input class="input" type="email" placeholder="admin@example.com" autocomplete="username" />
+        </label>
+
+        <label class="field">
+          <span class="field__label">Password</span>
+          <input class="input" type="password" placeholder="••••••••" autocomplete="current-password" />
+        </label>
+
+        <div class="form__row">
+          <label class="checkbox">
+            <input type="checkbox" />
+            Remember me
+          </label>
+          <a href="#" class="form__link">Forgot password?</a>
+        </div>
+
+        <button class="btn form__submit" type="submit">Sign in</button>
+      </form>
+    </div>
+
+    <p class="auth__back">
+      <a routerLink="/" class="auth__back-link">← Back to site</a>
+    </p>
+  </div>
+</main>
