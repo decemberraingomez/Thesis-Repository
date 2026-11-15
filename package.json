@@ -6,7 +6,10 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "api": "node server/src/server.js",
+    "api:dev": "nodemon server/src/server.js",
+    "seed": "tsc -p backend && node backend/dist/seeds/seedThesis.js"
   },
   "private": true,
   "packageManager": "npm@12.0.2",
@@ -17,7 +20,9 @@
     "@angular/forms": "^22.2.0",
     "@angular/platform-browser": "^22.2.0",
     "@angular/router": "^22.2.0",
+    "cors": "^2.8.6",
     "dotenv": "^18.0.10",
+    "express": "^5.3.0",
     "mongoose": "^9.12.1",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0"
@@ -28,6 +33,7 @@
     "@angular/compiler-cli": "^22.2.0",
     "@types/node": "^26.6.6",
     "jsdom": "^30.0.0",
+    "nodemon": "^3.1.14",
     "prettier": "^3.8.1",
     "typescript": "~6.0.2",
     "vitest": "^5.0.0"

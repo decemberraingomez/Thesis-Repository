@@ -1,0 +1,92 @@
+<header class="site-header">
+  <div class="container site-header__inner">
+    <a routerLink="/" class="brand">Thesis Repository</a>
+    <nav class="nav">
+      <a routerLink="/search" class="nav__link nav__link--active">Browse</a>
+      <a routerLink="/" class="nav__link">About</a>
+      <a routerLink="/login" class="btn btn--ghost nav__cta">Admin login</a>
+    </nav>
+  </div>
+</header>
+
+<main class="container page">
+  <form class="search-bar" role="search">
+    <input
+      class="input search-bar__input"
+      type="search"
+      placeholder="Search by title, author, or keyword"
+      aria-label="Search theses"
+    />
+    <button class="btn search-bar__button" type="submit">Search</button>
+  </form>
+
+  <div class="layout">
+    <aside class="filters" aria-label="Filters">
+      <div class="filters__group">
+        <h2 class="filters__title">Year</h2>
+        <label class="checkbox"><input type="checkbox" /> 2026</label>
+        <label class="checkbox"><input type="checkbox" /> 2025</label>
+        <label class="checkbox"><input type="checkbox" /> 2024</label>
+        <label class="checkbox"><input type="checkbox" /> 2023</label>
+      </div>
+
+      <div class="filters__group">
+        <h2 class="filters__title">Topic</h2>
+        <label class="checkbox"><input type="checkbox" /> Information retrieval</label>
+        <label class="checkbox"><input type="checkbox" /> Ranking</label>
+        <label class="checkbox"><input type="checkbox" /> Indexing</label>
+        <label class="checkbox"><input type="checkbox" /> Evaluation</label>
+      </div>
+
+      <div class="filters__group">
+        <h2 class="filters__title">Language</h2>
+        <label class="checkbox"><input type="checkbox" /> English</label>
+        <label class="checkbox"><input type="checkbox" /> Croatian</label>
+      </div>
+    </aside>
+
+    <section class="results">
+      <div class="results__header">
+        <p class="results__count">4 results</p>
+        <label class="sort">
+          Sort
+          <select class="sort__select" aria-label="Sort results">
+            <option>Relevance</option>
+            <option>Newest first</option>
+            <option>Oldest first</option>
+            <option>Title A–Z</option>
+          </select>
+        </label>
+      </div>
+
+      <ul class="result-list">
+        @for (result of results; track result.title) {
+          <li class="result">
+            <h2 class="result__title">{{ result.title }}</h2>
+            <p class="result__meta">{{ result.author }} · {{ result.meta }}</p>
+            <p class="result__abstract">{{ result.abstract }}</p>
+            <div class="result__actions">
+              <a class="result__link" href="#">View record</a>
+              <a class="result__link" href="#">Full text</a>
+            </div>
+          </li>
+        }
+      </ul>
+
+      <nav class="pagination" aria-label="Pagination">
+        <button class="pagination__item" type="button" disabled>Previous</button>
+        <button class="pagination__item pagination__item--active" type="button">1</button>
+        <button class="pagination__item" type="button">2</button>
+        <button class="pagination__item" type="button">3</button>
+        <button class="pagination__item" type="button">Next</button>
+      </nav>
+    </section>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="container site-footer__inner">
+    <span class="site-footer__copy">© 2026 Thesis Repository</span>
+    <a routerLink="/login" class="site-footer__link">Administrator</a>
+  </div>
+</footer>
