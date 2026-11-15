@@ -6,9 +6,11 @@
 
 const express = require('express');
 const mongoose = require('mongoose');
-const Thesis = require('../models/Thesis');
-
-const { THESIS_CATEGORIES, THESIS_STATUSES } = Thesis;
+const {
+  Thesis,
+  THESIS_CATEGORIES,
+  THESIS_STATUSES,
+} = require('../../../backend/dist/models/Thesis.js');
 
 const router = express.Router();
 

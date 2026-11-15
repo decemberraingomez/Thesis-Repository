@@ -15,6 +15,21 @@ export type ThesisCategory =
 
 export type ThesisStatus = 'Under Review' | 'Approved' | 'Published' | 'Archived';
 
+export const THESIS_CATEGORIES: ThesisCategory[] = [
+  'Artificial Intelligence',
+  'Data Science',
+  'Software Engineering',
+  'Network & Security',
+  'Web & Mobile Development',
+];
+
+export const THESIS_STATUSES: ThesisStatus[] = [
+  'Under Review',
+  'Approved',
+  'Published',
+  'Archived',
+];
+
 export interface IThesis extends Document {
   title: string;
   abstract: string;
@@ -64,13 +79,7 @@ const thesisSchema = new Schema<IThesis>(
       type: String,
       required: [true, 'Category is required'],
       enum: {
-        values: [
-          'Artificial Intelligence',
-          'Data Science',
-          'Software Engineering',
-          'Network & Security',
-          'Web & Mobile Development',
-        ],
+        values: THESIS_CATEGORIES,
         message: '{VALUE} is not an accepted category',
       },
     },
@@ -78,7 +87,7 @@ const thesisSchema = new Schema<IThesis>(
       type: String,
       required: true,
       enum: {
-        values: ['Under Review', 'Approved', 'Published', 'Archived'],
+        values: THESIS_STATUSES,
         message: '{VALUE} is not an accepted status',
       },
       default: 'Under Review',
