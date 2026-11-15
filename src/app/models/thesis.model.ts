@@ -1,3 +1,9 @@
+/**
+ * Author: Jezreel M. Onos
+ * Date: November 2026
+ * Assignment Title: CSAPPD1 Final Project - Thesis Repository
+ */
+
 export type ThesisCategory =
   | 'Artificial Intelligence'
   | 'Data Science'

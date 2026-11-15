@@ -1,3 +1,9 @@
+/**
+ * Author: Jezreel M. Onos
+ * Date: November 2026
+ * Assignment Title: CSAPPD1 Final Project - Thesis Repository
+ */
+
 import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';

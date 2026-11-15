@@ -1,3 +1,9 @@
+/**
+ * Author: Jezreel M. Onos
+ * Date: November 2026
+ * Assignment Title: CSAPPD1 Final Project - Thesis Repository
+ */
+
 import 'dotenv/config';
 import mongoose from 'mongoose';
 import { Thesis } from '../models/Thesis';
