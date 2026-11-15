@@ -1,3 +1,9 @@
+/**
+ * Author: Jezreel M. Onos
+ * Date: November 15, 2026
+ * Assignment Title: CSAPPD1 Final Project - Thesis Repository
+ */
+
 import { Routes } from '@angular/router';
 
 export const routes: Routes = [

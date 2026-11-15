@@ -11,6 +11,11 @@
 npm-debug.log
 yarn-error.log
 
+# Environment variables
+.env
+.env.*
+!.env.example
+
 # IDEs and editors
 .idea/
 .project
@@ -46,5 +51,5 @@ Thumbs.db
 # Vibe Code Gods
 .commandcode/
 
-# Environment Files
-.env
+# Backend build output
+/backend/dist
