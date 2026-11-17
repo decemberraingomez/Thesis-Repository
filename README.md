@@ -1,59 +1,85 @@
-# ThesisRepository
+# Thesis Repository Search Engine
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.2.6.
+CSAPPD1 Final Project, University of Baguio, School of Information Technology.
 
-## Development server
+A web app where students, thesis advisers and library admins can search, view, add, edit and delete thesis records, with a thesis status summary and a "needs review" flag.
 
-To start a local development server, run:
+## Team
 
-```bash
-ng serve
+- Andrada, Jim Magnus C.
+- Gomez, December Rain
+- Onos, Jezreel
+
+## Tech stack
+
+| Tier | Technology |
+|---|---|
+| Frontend | Angular (standalone components, signals, reactive forms, HttpClient) |
+| Backend | Node.js + Express REST API |
+| Database | MongoDB Atlas through Mongoose |
+
+```
+Angular (port 4200)  --HTTP/JSON-->  Express API (port 3000)  --Mongoose-->  MongoDB Atlas
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+## Project structure
 
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
+```
+src/app/models/        Thesis interface
+src/app/services/      ThesisService (all HTTP calls)
+src/app/pages/         page components
+backend/models/        Mongoose Thesis schema
+backend/seeds/         seed script (10 sample theses)
+server/src/server.js   Express server
+server/src/routes/     /api/theses routes
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+## Getting started
 
-```bash
-ng generate --help
-```
+Run every command from the **project root**, not from inside `server/`.
 
-## Building
+1. Install the packages:
 
-To build the project run:
+   ```bash
+   npm install
+   ```
 
-```bash
-ng build
-```
+2. Create your environment file. Copy `.env.example` to `.env` and put your MongoDB Atlas connection string in it:
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+   ```
+   MONGODB_URI=your-mongodb-atlas-connection-string
+   ```
 
-## Running unit tests
+   `.env` is git-ignored. Never commit it.
 
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+3. (Optional) Load the 10 sample theses. **This deletes all existing theses first.**
 
-```bash
-ng test
-```
+   ```bash
+   npm run seed
+   ```
 
-## Running end-to-end tests
+4. Start the API (restarts automatically when you save):
 
-For end-to-end (e2e) testing, run:
+   ```bash
+   npm run api:dev
+   ```
 
-```bash
-ng e2e
-```
+   The API runs at `http://localhost:3000/api/theses`.
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+5. In a second terminal, start the Angular app:
 
-## Additional Resources
+   ```bash
+   npx ng serve
+   ```
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+   Open `http://localhost:4200/`.
+
+## API endpoints
+
+| Method | Endpoint | Success | Errors |
+|---|---|---|---|
+| GET | `/api/theses` | 200, list of theses | 500 |
+| GET | `/api/theses/:id` | 200, one thesis | 400 (invalid id), 404, 500 |
+| POST | `/api/theses` | 201, the new thesis | 400, 500 |
+| PUT | `/api/theses/:id` | 200, the updated thesis | 400, 404, 500 |
+| DELETE | `/api/theses/:id` | 200, confirmation message | 400 (invalid id), 404, 500 |
