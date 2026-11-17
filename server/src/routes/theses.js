@@ -109,7 +109,7 @@ router.get('/', async (req, res, next) => {
     }
 
     const theses = await Thesis.find(filter).sort({ createdAt: -1 });
-    return res.status(200).json({ count: theses.length, data: theses });
+    return res.status(200).json(theses);
   } catch (error) {
     return next(error);
   }
@@ -124,7 +124,7 @@ router.post('/', async (req, res, next) => {
     }
 
     const thesis = await Thesis.create(req.body);
-    return res.status(201).json({ message: 'Thesis created', data: thesis });
+    return res.status(201).json(thesis);
   } catch (error) {
     return next(error);
   }
@@ -142,7 +142,7 @@ router.get('/:id', async (req, res, next) => {
       return sendNotFound(res);
     }
 
-    return res.status(200).json({ data: thesis });
+    return res.status(200).json(thesis);
   } catch (error) {
     return next(error);
   }
@@ -169,7 +169,7 @@ router.put('/:id', async (req, res, next) => {
       return sendNotFound(res);
     }
 
-    return res.status(200).json({ message: 'Thesis updated', data: thesis });
+    return res.status(200).json(thesis);
   } catch (error) {
     return next(error);
   }
