@@ -187,7 +187,7 @@ router.delete('/:id', async (req, res, next) => {
       return sendNotFound(res);
     }
 
-    return res.status(204).send();
+    return res.status(200).json({ message: 'Thesis deleted' });
   } catch (error) {
     return next(error);
   }
