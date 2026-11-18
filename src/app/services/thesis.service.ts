@@ -1,15 +1,15 @@
 /**
  * Author: Jezreel M. Onos
  * Date: November 18, 2026
- * Assignment Title: CSAPPD1 Final Project - Thesis Repository
+ * Assignment Title: CSAPPD1 Final Project - Thesis Repository Search Engine
  */
 
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { map, Observable } from 'rxjs';
+import { Observable } from 'rxjs';
 import { Thesis } from '../models/thesis.model';
 
-export const API_BASE_URL = 'http://localhost:5000/api';
+export const API_BASE_URL = 'http://localhost:3000/api';
 
 export interface ThesisInput {
   title: string;
@@ -27,43 +27,25 @@ export interface ApiErrorBody {
   errors?: string[];
 }
 
-export interface ThesisListResponse {
-  count: number;
-  data: Thesis[];
-}
-
-export interface ThesisResponse {
-  message?: string;
-  data: Thesis;
-}
-
 @Injectable({ providedIn: 'root' })
 export class ThesisService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = `${API_BASE_URL}/theses`;
 
   getTheses(): Observable<Thesis[]> {
-    return this.http
-      .get<ThesisListResponse>(this.baseUrl)
-      .pipe(map((response) => response.data));
+    return this.http.get<Thesis[]>(this.baseUrl);
   }
 
   getThesis(id: string): Observable<Thesis> {
-    return this.http
-      .get<ThesisResponse>(`${this.baseUrl}/${id}`)
-      .pipe(map((response) => response.data));
+    return this.http.get<Thesis>(`${this.baseUrl}/${id}`);
   }
 
   createThesis(payload: ThesisInput): Observable<Thesis> {
-    return this.http
-      .post<ThesisResponse>(this.baseUrl, payload)
-      .pipe(map((response) => response.data));
+    return this.http.post<Thesis>(this.baseUrl, payload);
   }
 
   updateThesis(id: string, payload: ThesisInput): Observable<Thesis> {
-    return this.http
-      .put<ThesisResponse>(`${this.baseUrl}/${id}`, payload)
-      .pipe(map((response) => response.data));
+    return this.http.put<Thesis>(`${this.baseUrl}/${id}`, payload);
   }
 
   deleteThesis(id: string): Observable<void> {
@@ -73,7 +55,7 @@ export class ThesisService {
   describeError(error: unknown): string {
     if (error instanceof HttpErrorResponse) {
       if (error.status === 0) {
-        return 'Cannot reach the thesis API. Make sure the Express server is running on port 5000.';
+        return 'Cannot reach the thesis API. Make sure the Express server is running on port 3000.';
       }
 
       const body = error.error;

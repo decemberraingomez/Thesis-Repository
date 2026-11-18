@@ -1,7 +1,7 @@
 /**
  * Author: Jezreel M. Onos
  * Date: November 18, 2026
- * Assignment Title: CSAPPD1 Final Project - Thesis Repository
+ * Assignment Title: CSAPPD1 Final Project - Thesis Repository Search Engine
  */
 
 import { provideHttpClient } from '@angular/common/http';
@@ -39,8 +39,8 @@ describe('ThesesList', () => {
 
     fixture.detectChanges();
 
-    const listRequest = http.expectOne('http://localhost:5000/api/theses');
-    listRequest.flush({ count: 1, data: [sampleThesis] });
+    const listRequest = http.expectOne('http://localhost:3000/api/theses');
+    listRequest.flush([sampleThesis]);
     fixture.detectChanges();
 
     const host = fixture.nativeElement as HTMLElement;
@@ -51,7 +51,7 @@ describe('ThesesList', () => {
     deleteButton?.click();
     fixture.detectChanges();
 
-    http.expectNone(`http://localhost:5000/api/theses/${sampleThesis._id}`);
+    http.expectNone(`http://localhost:3000/api/theses/${sampleThesis._id}`);
     expect(host.querySelector('.dialog')).not.toBeNull();
 
     const dialogButtons = host.querySelectorAll<HTMLButtonElement>('.dialog__button');
@@ -59,10 +59,10 @@ describe('ThesesList', () => {
     fixture.detectChanges();
 
     const deleteRequest = http.expectOne(
-      `http://localhost:5000/api/theses/${sampleThesis._id}`
+      `http://localhost:3000/api/theses/${sampleThesis._id}`
     );
     expect(deleteRequest.request.method).toBe('DELETE');
-    deleteRequest.flush(null, { status: 204, statusText: 'No Content' });
+    deleteRequest.flush({ message: 'Thesis deleted' }, { status: 200, statusText: 'OK' });
     fixture.detectChanges();
 
     expect(host.querySelectorAll('.record').length).toBe(0);

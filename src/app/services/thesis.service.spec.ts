@@ -1,7 +1,7 @@
 /**
  * Author: Jezreel M. Onos
  * Date: November 18, 2026
- * Assignment Title: CSAPPD1 Final Project - Thesis Repository
+ * Assignment Title: CSAPPD1 Final Project - Thesis Repository Search Engine
  */
 
 import { provideHttpClient } from '@angular/common/http';
@@ -59,7 +59,7 @@ describe('ThesisService', () => {
 
     const request = httpTesting.expectOne(`${API_BASE_URL}/theses`);
     expect(request.request.method).toBe('GET');
-    request.flush({ count: 1, data: [sampleThesis] });
+    request.flush([sampleThesis]);
 
     expect(result.length).toBe(1);
     expect(result[0].title).toBe(sampleThesis.title);
@@ -75,7 +75,7 @@ describe('ThesisService', () => {
     const request = httpTesting.expectOne(`${API_BASE_URL}/theses`);
     expect(request.request.method).toBe('POST');
     expect(request.request.body).toEqual(samplePayload);
-    request.flush({ message: 'Thesis created', data: sampleThesis }, { status: 201, statusText: 'Created' });
+    request.flush(sampleThesis, { status: 201, statusText: 'Created' });
 
     expect(created).not.toBeNull();
   });
@@ -85,7 +85,7 @@ describe('ThesisService', () => {
 
     const request = httpTesting.expectOne(`${API_BASE_URL}/theses/${sampleThesis._id}`);
     expect(request.request.method).toBe('PUT');
-    request.flush({ message: 'Thesis updated', data: sampleThesis });
+    request.flush(sampleThesis);
 
     expect(request.request.body).toEqual(samplePayload);
   });
@@ -101,7 +101,7 @@ describe('ThesisService', () => {
 
     const request = httpTesting.expectOne(`${API_BASE_URL}/theses/${sampleThesis._id}`);
     expect(request.request.method).toBe('DELETE');
-    request.flush(null, { status: 204, statusText: 'No Content' });
+    request.flush({ message: 'Thesis deleted' }, { status: 200, statusText: 'OK' });
 
     expect(completed).toBe(true);
   });

@@ -1,7 +1,7 @@
 /**
  * Author: Jezreel M. Onos
  * Date: November 18, 2026
- * Assignment Title: CSAPPD1 Final Project - Thesis Repository
+ * Assignment Title: CSAPPD1 Final Project - Thesis Repository Search Engine
  */
 
 import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';

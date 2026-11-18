@@ -1,7 +1,7 @@
 /**
  * Author: Jezreel M. Onos
  * Date: November 18, 2026
- * Assignment Title: CSAPPD1 Final Project - Thesis Repository
+ * Assignment Title: CSAPPD1 Final Project - Thesis Repository Search Engine
  */
 
 import { provideHttpClient } from '@angular/common/http';
@@ -99,10 +99,10 @@ describe('ThesisForm', () => {
     const { component, http } = createComponent(existingThesis._id as string);
 
     const request = http.expectOne(
-      `http://localhost:5000/api/theses/${existingThesis._id}`
+      `http://localhost:3000/api/theses/${existingThesis._id}`
     );
     expect(request.request.method).toBe('GET');
-    request.flush({ data: existingThesis });
+    request.flush(existingThesis);
 
     const form = getForm(component);
 
