@@ -1,0 +1,53 @@
+<!--
+  Author: Jezreel M. Onos
+  Date: November 18, 2026
+  Assignment Title: CSAPPD1 Final Project - Thesis Repository
+-->
+
+@if (open()) {
+  <div
+    class="dialog-backdrop"
+    role="presentation"
+    [class.dialog-backdrop--busy]="busy()"
+    (click)="onBackdropClick($event)"
+  >
+    <section
+      class="dialog"
+      role="alertdialog"
+      aria-modal="true"
+      aria-labelledby="confirm-dialog-title"
+      aria-describedby="confirm-dialog-message"
+      [class.dialog--busy]="busy()"
+      [style.maxWidth.px]="maxWidth()"
+    >
+      <h2 class="dialog__title" id="confirm-dialog-title">{{ title() }}</h2>
+      <p class="dialog__message" id="confirm-dialog-message">{{ message() }}</p>
+
+      <div class="dialog__actions">
+        <button
+          type="button"
+          class="btn btn--ghost dialog__button"
+          [disabled]="busy()"
+          (click)="cancel()"
+        >
+          {{ cancelLabel() }}
+        </button>
+        <button
+          type="button"
+          class="btn dialog__button"
+          [class.dialog__button--danger]="variant() === 'danger'"
+          [class.dialog__button--busy]="busy()"
+          [disabled]="busy()"
+          (click)="confirm()"
+        >
+          @if (busy()) {
+            <span class="dialog__spinner" aria-hidden="true"></span>
+            Working...
+          } @else {
+            {{ confirmLabel() }}
+          }
+        </button>
+      </div>
+    </section>
+  </div>
+}

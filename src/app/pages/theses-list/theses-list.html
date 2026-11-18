@@ -1,0 +1,133 @@
+<!--
+  Author: Jezreel M. Onos
+  Date: November 18, 2026
+  Assignment Title: CSAPPD1 Final Project - Thesis Repository
+-->
+
+<header class="site-header">
+  <div class="container site-header__inner">
+    <a routerLink="/" class="brand">Thesis Repository</a>
+    <nav class="nav" aria-label="Primary">
+      <a routerLink="/theses" class="nav__link nav__link--active">Browse</a>
+      <a routerLink="/theses/new" class="nav__link">Add thesis</a>
+      <a routerLink="/login" class="btn btn--ghost nav__cta">Admin login</a>
+    </nav>
+  </div>
+</header>
+
+<main class="container page">
+  <div class="page__header">
+    <div>
+      <h1 class="page__title">Thesis repository</h1>
+      <p class="page__text">
+        Browse, edit, and remove thesis records stored in MongoDB through the internal API.
+      </p>
+    </div>
+    <a routerLink="/theses/new" class="btn">Add thesis</a>
+  </div>
+
+  @if (successMessage()) {
+    <div class="alert alert--success" role="status">{{ successMessage() }}</div>
+  }
+
+  @if (errorMessage()) {
+    <div class="alert alert--error" role="alert">
+      <span>{{ errorMessage() }}</span>
+      @if (!loading()) {
+        <button type="button" class="alert__retry" (click)="loadTheses()">Retry</button>
+      }
+    </div>
+  }
+
+  <div class="toolbar">
+    <label class="search">
+      <span class="search__label">Filter records</span>
+      <input
+        class="input"
+        type="search"
+        placeholder="Search by title, author, adviser, or category"
+        [value]="query()"
+        (input)="onSearchInput($event)"
+      />
+    </label>
+    <p class="toolbar__count">
+      {{ filteredTheses().length }} of {{ theses().length }} record{{ theses().length === 1 ? '' : 's' }}
+    </p>
+  </div>
+
+  @if (loading()) {
+    <p class="state" role="status">Loading theses from the API...</p>
+  } @else if (filteredTheses().length === 0) {
+    <div class="empty">
+      <p class="empty__title">No thesis records found.</p>
+      <p class="empty__text">
+        @if (theses().length === 0) {
+          The repository is empty. Add your first thesis to get started.
+        } @else {
+          Try a different filter term.
+        }
+      </p>
+      <a routerLink="/theses/new" class="btn">Add thesis</a>
+    </div>
+  } @else {
+    <ul class="record-list">
+      @for (thesis of filteredTheses(); track $index) {
+        <li class="record">
+          <div class="record__main">
+            <div class="record__badges">
+              <span class="badge">{{ thesis.category }}</span>
+              <span class="badge badge--status">{{ thesis.status }}</span>
+              <span class="badge">{{ thesis.year }}</span>
+            </div>
+            <h2 class="record__title">
+              <a routerLink="/theses/{{ thesis._id }}" class="record__title-link">
+                {{ thesis.title }}
+              </a>
+            </h2>
+            <p class="record__meta">
+              {{ thesis.authors.join(', ') }} &middot; Adviser: {{ thesis.adviser }}
+            </p>
+            <p class="record__abstract">{{ thesis.abstract }}</p>
+            <p class="record__date">Defended {{ formatDate(thesis.defenseDate) }}</p>
+          </div>
+
+          <div class="record__actions">
+            <a routerLink="/theses/{{ thesis._id }}" class="btn btn--ghost record__button">
+              View
+            </a>
+            <a routerLink="/theses/{{ thesis._id }}/edit" class="btn btn--ghost record__button">
+              Edit
+            </a>
+            <button
+              type="button"
+              class="btn btn--ghost btn--danger record__button"
+              [disabled]="deleting()"
+              (click)="requestDelete(thesis)"
+            >
+              Delete
+            </button>
+          </div>
+        </li>
+      }
+    </ul>
+  }
+
+  <app-confirm-dialog
+    [open]="deleteDialogOpen()"
+    [busy]="deleting()"
+    [title]="'Delete thesis?'"
+    [message]="deleteMessage()"
+    [confirmLabel]="'Delete thesis'"
+    [cancelLabel]="'Keep thesis'"
+    [variant]="'danger'"
+    (confirmed)="confirmDelete()"
+    (cancelled)="cancelDelete()"
+  />
+</main>
+
+<footer class="site-footer">
+  <div class="container site-footer__inner">
+    <span class="site-footer__copy">Thesis Repository</span>
+    <a routerLink="/search" class="site-footer__link">Search portal</a>
+  </div>
+</footer>

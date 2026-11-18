@@ -1,0 +1,82 @@
+/**
+ * Author: Jezreel M. Onos
+ * Date: November 18, 2026
+ * Assignment Title: CSAPPD1 Final Project - Thesis Repository
+ */
+
+.dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(24, 24, 27, 0.45);
+}
+
+.dialog-backdrop--busy {
+  cursor: progress;
+}
+
+.dialog {
+  width: 100%;
+  padding: 24px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg);
+  box-shadow: 0 18px 48px rgba(24, 24, 27, 0.18);
+}
+
+.dialog--busy {
+  opacity: 0.96;
+}
+
+.dialog__title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.dialog__message {
+  margin: 10px 0 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.dialog__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 24px;
+}
+
+.dialog__button {
+  height: 40px;
+  font-size: 13px;
+}
+
+.dialog__button--danger {
+  border-color: #b91c1c;
+  background: #b91c1c;
+}
+
+.dialog__button--busy {
+  gap: 8px;
+}
+
+.dialog__spinner {
+  width: 13px;
+  height: 13px;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: dialog-spin 0.7s linear infinite;
+}
+
+@keyframes dialog-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
