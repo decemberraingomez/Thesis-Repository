@@ -1,7 +1,7 @@
 /**
  * Author: Jezreel M. Onos
- * Date: November 15, 2026
- * Assignment Title: CSAPPD1 Final Project - Thesis Repository
+ * Date: November 18, 2026
+ * Assignment Title: CSAPPD1 Final Project - Thesis Repository Search Engine
  */
 
 export type ThesisCategory =
@@ -13,16 +13,31 @@ export type ThesisCategory =
 
 export type ThesisStatus = 'Under Review' | 'Approved' | 'Published' | 'Archived';
 
+export const THESIS_CATEGORIES: ThesisCategory[] = [
+  'Artificial Intelligence',
+  'Data Science',
+  'Software Engineering',
+  'Network & Security',
+  'Web & Mobile Development',
+];
+
+export const THESIS_STATUSES: ThesisStatus[] = [
+  'Under Review',
+  'Approved',
+  'Published',
+  'Archived',
+];
+
 export interface Thesis {
   _id?: string;
-  title: string;              // String field
-  abstract: string;           // String field
-  authors: string[];          // Array of Strings
-  adviser: string;            // String field
-  year: number;               // Number field
-  category: ThesisCategory;   // Category field (Union Type)
-  status: ThesisStatus;       // Status field (Union Type)
-  defenseDate: string | Date; // Date field
+  title: string;
+  abstract: string;
+  authors: string[];
+  adviser: string;
+  year: number;
+  category: ThesisCategory;
+  status: ThesisStatus;
+  defenseDate: string | Date;
   createdAt?: string | Date;
   updatedAt?: string | Date;
 }

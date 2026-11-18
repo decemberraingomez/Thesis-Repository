@@ -1,7 +1,7 @@
 /**
  * Author: Jezreel M. Onos
- * Date: November 15, 2026
- * Assignment Title: CSAPPD1 Final Project - Thesis Repository
+ * Date: November 18, 2026
+ * Assignment Title: CSAPPD1 Final Project - Thesis Repository Search Engine
  */
 
 import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
@@ -12,7 +12,7 @@ import { routes } from './app.routes';
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
+    provideHttpClient(),
     provideRouter(routes),
-    provideHttpClient()
-  ]
+  ],
 };

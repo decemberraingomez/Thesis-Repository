@@ -1,0 +1,258 @@
+<!--
+  Author: Jezreel M. Onos
+  Date: November 18, 2026
+  Assignment Title: CSAPPD1 Final Project - Thesis Repository Search Engine
+-->
+
+<header class="site-header">
+  <div class="container site-header__inner">
+    <a routerLink="/" class="brand">Thesis Repository</a>
+    <nav class="nav" aria-label="Primary">
+      <a routerLink="/theses" class="nav__link">Browse</a>
+      <a routerLink="/theses/new" class="nav__link nav__link--active">Add thesis</a>
+      <a routerLink="/login" class="btn btn--ghost nav__cta">Admin login</a>
+    </nav>
+  </div>
+</header>
+
+<main class="container page">
+  <div class="page__header">
+    <a routerLink="/theses" class="back-link">&larr; Back to theses</a>
+    <h1 class="page__title">{{ isEditMode() ? 'Edit thesis record' : 'Add a thesis record' }}</h1>
+    <p class="page__text">
+      @if (isEditMode()) {
+        Update the bibliographic details and save your changes to the repository.
+      } @else {
+        Register a new thesis in the repository. Fields marked with * are required.
+      }
+    </p>
+  </div>
+
+  @if (successMessage()) {
+    <div class="alert alert--success" role="status">{{ successMessage() }}</div>
+  }
+
+  @if (errorMessage()) {
+    <div class="alert alert--error" role="alert">
+      <p class="alert__text">{{ errorMessage() }}</p>
+      @if (serverErrors().length > 0) {
+        <ul class="alert__list">
+          @for (message of serverErrors(); track $index) {
+            <li>{{ message }}</li>
+          }
+        </ul>
+      }
+    </div>
+  }
+
+  @if (loading()) {
+    <p class="state" role="status">Loading thesis record...</p>
+  } @else {
+    <form class="form-layout" [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+      <div class="form-main">
+        <section class="panel">
+          <h2 class="panel__title">Bibliographic details</h2>
+
+          <label class="field">
+            <span class="field__label">Title <span class="required">*</span></span>
+            <input
+              class="input"
+              type="text"
+              formControlName="title"
+              placeholder="Thesis title"
+              [class.input--invalid]="showError(form.controls.title, 'required') || showError(form.controls.title, 'maxlength')"
+            />
+            @if (showError(form.controls.title, 'required')) {
+              <span class="field__error">Title is required.</span>
+            }
+            @if (showError(form.controls.title, 'maxlength')) {
+              <span class="field__error">Title cannot exceed 200 characters.</span>
+            }
+          </label>
+
+          <div class="field">
+            <span class="field__label">Authors <span class="required">*</span></span>
+            <div class="author-list" formArrayName="authors">
+              @for (author of authors.controls; track $index; let index = $index) {
+                <div class="author-row">
+                  <input
+                    class="input"
+                    type="text"
+                    [formControlName]="index"
+                    placeholder="Full name"
+                    [class.input--invalid]="showError(author, 'required')"
+                  />
+                  <button
+                    type="button"
+                    class="btn btn--ghost author-row__remove"
+                    [disabled]="authors.length === 1"
+                    (click)="removeAuthor(index)"
+                  >
+                    Remove
+                  </button>
+                </div>
+                @if (showError(author, 'required')) {
+                  <span class="field__error">Author name is required.</span>
+                }
+              }
+            </div>
+            <button type="button" class="btn btn--ghost btn--small" (click)="addAuthor()">
+              Add author
+            </button>
+          </div>
+
+          <label class="field">
+            <span class="field__label">Adviser <span class="required">*</span></span>
+            <input
+              class="input"
+              type="text"
+              formControlName="adviser"
+              placeholder="Adviser name"
+              [class.input--invalid]="showError(form.controls.adviser, 'required')"
+            />
+            @if (showError(form.controls.adviser, 'required')) {
+              <span class="field__error">Adviser name is required.</span>
+            }
+          </label>
+
+          <label class="field">
+            <span class="field__label">Abstract <span class="required">*</span></span>
+            <textarea
+              class="input textarea"
+              formControlName="abstract"
+              placeholder="Short abstract of the thesis"
+              [class.input--invalid]="showError(form.controls.abstract, 'required')"
+            ></textarea>
+            @if (showError(form.controls.abstract, 'required')) {
+              <span class="field__error">Abstract is required.</span>
+            }
+          </label>
+        </section>
+
+        <section class="panel">
+          <h2 class="panel__title">Classification</h2>
+
+          <div class="field-row">
+            <label class="field">
+              <span class="field__label">Publication year <span class="required">*</span></span>
+              <input
+                class="input"
+                type="number"
+                formControlName="year"
+                [min]="2000"
+                [max]="maxYear"
+                [class.input--invalid]="showError(form.controls.year, 'required') || showError(form.controls.year, 'min') || showError(form.controls.year, 'max')"
+              />
+              @if (showError(form.controls.year, 'required')) {
+                <span class="field__error">Publication year is required.</span>
+              }
+              @if (showError(form.controls.year, 'min') || showError(form.controls.year, 'max')) {
+                <span class="field__error">Year must be between {{ formatYears() }}.</span>
+              }
+            </label>
+
+            <label class="field">
+              <span class="field__label">Defense date <span class="required">*</span></span>
+              <input
+                class="input"
+                type="date"
+                formControlName="defenseDate"
+                [class.input--invalid]="showError(form.controls.defenseDate, 'required')"
+              />
+              @if (showError(form.controls.defenseDate, 'required')) {
+                <span class="field__error">Defense date is required.</span>
+              }
+            </label>
+          </div>
+
+          <div class="field-row">
+            <label class="field">
+              <span class="field__label">Category <span class="required">*</span></span>
+              <select class="input" formControlName="category">
+                @for (category of categories; track category) {
+                  <option [value]="category">{{ category }}</option>
+                }
+              </select>
+            </label>
+
+            <label class="field">
+              <span class="field__label">Status <span class="required">*</span></span>
+              <select class="input" formControlName="status">
+                @for (status of statuses; track status) {
+                  <option [value]="status">{{ status }}</option>
+                }
+              </select>
+            </label>
+          </div>
+        </section>
+
+        <div class="form-actions">
+          <a routerLink="/theses" class="btn btn--ghost">Cancel</a>
+          <button
+            class="btn"
+            type="submit"
+            [disabled]="submitting() || successMessage().length > 0"
+          >
+            @if (submitting()) {
+              Saving...
+            } @else {
+              {{ isEditMode() ? 'Save changes' : 'Create thesis' }}
+            }
+          </button>
+        </div>
+      </div>
+
+      <aside class="reference-card" aria-label="External reference lookup">
+        <h2 class="reference-card__title">Crossref lookup</h2>
+        <p class="reference-card__text">
+          Optional: fetch title, authors, and year from a DOI. Lookup failures never block
+          saving the thesis.
+        </p>
+
+        <label class="field">
+          <span class="field__label">DOI</span>
+          <input
+            class="input"
+            type="text"
+            formControlName="doiLookup"
+            placeholder="10.1000/xyz123"
+          />
+        </label>
+
+        <button
+          type="button"
+          class="btn btn--ghost reference-card__button"
+          [disabled]="referenceBusy()"
+          (click)="lookupReference()"
+        >
+          @if (referenceBusy()) {
+            Looking up...
+          } @else {
+            Fetch metadata
+          }
+        </button>
+
+        @if (referenceMessage()) {
+          <p class="reference-card__status" role="status">{{ referenceMessage() }}</p>
+        }
+        @if (referenceError()) {
+          <p class="reference-card__error" role="alert">{{ referenceError() }}</p>
+        }
+
+        @if (referencePreview(); as reference) {
+          <div class="reference-card__preview">
+            <p class="reference-card__label">APA preview</p>
+            <p class="reference-card__citation">{{ reference.apa }}</p>
+          </div>
+        }
+      </aside>
+    </form>
+  }
+</main>
+
+<footer class="site-footer">
+  <div class="container site-footer__inner">
+    <span class="site-footer__copy">Thesis Repository</span>
+    <a routerLink="/theses" class="site-footer__link">Manage records</a>
+  </div>
+</footer>

@@ -1,0 +1,195 @@
+<!--
+  Author: Jezreel M. Onos
+  Date: November 18, 2026
+  Assignment Title: CSAPPD1 Final Project - Thesis Repository Search Engine
+-->
+
+<header class="site-header">
+  <div class="container site-header__inner">
+    <a routerLink="/" class="brand">Thesis Repository</a>
+    <nav class="nav" aria-label="Primary">
+      <a routerLink="/theses" class="nav__link nav__link--active">Browse</a>
+      <a routerLink="/theses/new" class="nav__link">Add thesis</a>
+      <a routerLink="/login" class="btn btn--ghost nav__cta">Admin login</a>
+    </nav>
+  </div>
+</header>
+
+<main class="container page">
+  <a routerLink="/theses" class="back-link">&larr; Back to theses</a>
+
+  @if (successMessage()) {
+    <div class="alert alert--success" role="status">{{ successMessage() }}</div>
+  }
+
+  @if (actionError()) {
+    <div class="alert alert--error" role="alert">{{ actionError() }}</div>
+  }
+
+  @if (loading()) {
+    <p class="state" role="status">Loading thesis record...</p>
+  } @else if (errorMessage()) {
+    <div class="alert alert--error" role="alert">
+      <p class="alert__text">{{ errorMessage() }}</p>
+      <a routerLink="/theses" class="alert__link">Return to the thesis list</a>
+    </div>
+  } @else if (thesis(); as record) {
+    <article class="detail">
+      <div class="detail__main">
+        <header class="detail__header">
+          <div class="detail__badges">
+            <span class="badge">{{ record.category }}</span>
+            <span
+              class="badge badge--status"
+              [class.badge--published]="record.status === 'Published'"
+              [class.badge--approved]="record.status === 'Approved'"
+              [class.badge--review]="record.status === 'Under Review'"
+              [class.badge--archived]="record.status === 'Archived'"
+            >
+              {{ record.status }}
+            </span>
+          </div>
+          <h1 class="detail__title">{{ record.title }}</h1>
+          <p class="detail__meta">
+            {{ record.year }} &middot; {{ record.authors.length }} author{{ record.authors.length === 1 ? '' : 's' }}
+          </p>
+        </header>
+
+        <section class="detail__section">
+          <h2 class="detail__heading">Authors</h2>
+          <ul class="author-list">
+            @for (author of record.authors; track $index) {
+              <li class="author-item">{{ author }}</li>
+            }
+          </ul>
+        </section>
+
+        <section class="detail__section">
+          <h2 class="detail__heading">Abstract</h2>
+          <p class="detail__abstract">{{ record.abstract }}</p>
+        </section>
+
+        <section class="detail__section">
+          <h2 class="detail__heading">Record details</h2>
+          <dl class="meta-grid">
+            <div class="meta-item">
+              <dt class="meta-item__label">Adviser</dt>
+              <dd class="meta-item__value">{{ record.adviser }}</dd>
+            </div>
+            <div class="meta-item">
+              <dt class="meta-item__label">Publication year</dt>
+              <dd class="meta-item__value">{{ record.year }}</dd>
+            </div>
+            <div class="meta-item">
+              <dt class="meta-item__label">Defense date</dt>
+              <dd class="meta-item__value">{{ formatDate(record.defenseDate) }}</dd>
+            </div>
+            <div class="meta-item">
+              <dt class="meta-item__label">Category</dt>
+              <dd class="meta-item__value">{{ record.category }}</dd>
+            </div>
+            <div class="meta-item">
+              <dt class="meta-item__label">Created</dt>
+              <dd class="meta-item__value">{{ formatDateTime(record.createdAt) }}</dd>
+            </div>
+            <div class="meta-item">
+              <dt class="meta-item__label">Last updated</dt>
+              <dd class="meta-item__value">{{ formatDateTime(record.updatedAt) }}</dd>
+            </div>
+          </dl>
+        </section>
+      </div>
+
+      <aside class="detail__aside">
+        <section class="panel">
+          <h2 class="panel__title">Actions</h2>
+          <div class="action-stack">
+            <a routerLink="/theses/{{ record._id }}/edit" class="btn">Edit thesis</a>
+            <button
+              type="button"
+              class="btn btn--ghost btn--danger"
+              [disabled]="deleting()"
+              (click)="openDeleteDialog()"
+            >
+              Delete thesis
+            </button>
+          </div>
+          <p class="panel__hint">
+            Deletion is confirmed first and permanently removes the record from MongoDB.
+          </p>
+        </section>
+
+        <section class="panel">
+          <h2 class="panel__title">Generate citations</h2>
+          <p class="panel__hint">Built from the saved thesis metadata.</p>
+
+          <p class="citation__label">APA</p>
+          <p class="citation__text">{{ apaCitation() }}</p>
+
+          <p class="citation__label">IEEE</p>
+          <p class="citation__text">{{ ieeeCitation() }}</p>
+
+          <button
+            type="button"
+            class="btn btn--ghost panel__button"
+            [disabled]="referenceBusy()"
+            (click)="searchExternalReferences()"
+          >
+            @if (referenceBusy()) {
+              Searching Crossref...
+            } @else {
+              Verify with Crossref
+            }
+          </button>
+
+          @if (referenceError()) {
+            <p class="citation__error" role="alert">{{ referenceError() }}</p>
+          }
+
+          @if (referenceResults().length > 0) {
+            <ul class="reference-list">
+              @for (reference of referenceResults(); track $index) {
+                <li class="reference-item">
+                  <p class="reference-item__title">{{ reference.title }}</p>
+                  <p class="reference-item__meta">
+                    {{ reference.authors.length > 0 ? reference.authors[0] : 'Unknown author' }}
+                    &middot; {{ reference.year }}
+                  </p>
+                  @if (reference.url) {
+                    <a
+                      class="reference-item__link"
+                      [href]="reference.url"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      View source
+                    </a>
+                  }
+                </li>
+              }
+            </ul>
+          }
+        </section>
+      </aside>
+    </article>
+
+    <app-confirm-dialog
+      [open]="deleteDialogOpen()"
+      [busy]="deleting()"
+      [title]="'Delete thesis?'"
+      [message]="deleteMessage()"
+      [confirmLabel]="'Delete thesis'"
+      [cancelLabel]="'Keep thesis'"
+      [variant]="'danger'"
+      (confirmed)="confirmDelete()"
+      (cancelled)="cancelDelete()"
+    />
+  }
+</main>
+
+<footer class="site-footer">
+  <div class="container site-footer__inner">
+    <span class="site-footer__copy">Thesis Repository</span>
+    <a routerLink="/theses" class="site-footer__link">Manage records</a>
+  </div>
+</footer>
