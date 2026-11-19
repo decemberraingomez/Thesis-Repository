@@ -22,6 +22,7 @@ const seedAdminSession = (): void => {
   localStorage.setItem(
     AUTH_USER_STORAGE_KEY,
     JSON.stringify({
+      id: '65f1d1f1f1f1f1f1f1f1f1f1f',
       name: 'Library Administrator',
       email: 'admin@ubaguio.edu',
       role: 'admin',

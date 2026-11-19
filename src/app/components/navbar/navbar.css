@@ -59,6 +59,15 @@
   font-weight: 600;
 }
 
+.nav__action {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+
 .nav__cta {
   height: 36px;
   padding: 0 14px;
@@ -122,6 +131,10 @@
 
   .nav__link {
     display: none;
+  }
+
+  .nav__action {
+    display: inline-flex;
   }
 
   .nav__user {

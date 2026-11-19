@@ -17,6 +17,7 @@ import {
 import { API_BASE_URL } from './thesis.service';
 
 const adminUser: AuthUser = {
+  id: '65f1d1f1f1f1f1f1f1f1f1f1f',
   name: 'Library Administrator',
   email: 'admin@ubaguio.edu',
   role: 'admin',
@@ -111,6 +112,23 @@ describe('AuthService', () => {
     expect(service.token()).toBeNull();
     expect(localStorage.getItem(AUTH_TOKEN_STORAGE_KEY)).toBeNull();
     expect(navigateSpy).toHaveBeenCalledWith(['/login']);
+    http.verify();
+  });
+
+  it('sends a password change request to the admin API', () => {
+    const service = TestBed.inject(AuthService);
+    const http = TestBed.inject(HttpTestingController);
+
+    service.changePassword('ThesisAdmin2026!', 'UpdatedAdmin2026!').subscribe();
+
+    const request = http.expectOne(`${API_BASE_URL}/auth/password`);
+    expect(request.request.method).toBe('PUT');
+    expect(request.request.body).toEqual({
+      currentPassword: 'ThesisAdmin2026!',
+      newPassword: 'UpdatedAdmin2026!',
+    });
+
+    request.flush({ message: 'Admin password updated successfully.' });
     http.verify();
   });
 

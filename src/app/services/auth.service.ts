@@ -12,7 +12,14 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable, tap } from 'rxjs';
-import { AuthUser, LoginRequest, LoginResponse, UserRole } from '../models/auth.model';
+import {
+  AuthUser,
+  ChangePasswordRequest,
+  ChangePasswordResponse,
+  LoginRequest,
+  LoginResponse,
+  UserRole,
+} from '../models/auth.model';
 import { API_BASE_URL } from './thesis.service';
 
 export const AUTH_TOKEN_STORAGE_KEY = 'thesis-repo.auth.token';
@@ -51,6 +58,15 @@ export class AuthService {
     );
   }
 
+  changePassword(
+    currentPassword: string,
+    newPassword: string
+  ): Observable<ChangePasswordResponse> {
+    const payload: ChangePasswordRequest = { currentPassword, newPassword };
+
+    return this.http.put<ChangePasswordResponse>(`${API_BASE_URL}/auth/password`, payload);
+  }
+
   logout(): void {
     this.clearSession();
     this.noticeState.set('');
@@ -82,6 +98,16 @@ export class AuthService {
 
       if (error.status === 0) {
         return 'Cannot reach the authentication API. Make sure the Express server is running on port 3000.';
+      }
+
+      if (error.status === 403) {
+        const message = (error.error as { message?: unknown } | null)?.message;
+
+        if (typeof message === 'string') {
+          return message;
+        }
+
+        return 'Your admin account is disabled.';
       }
 
       return `The server returned an unexpected error (HTTP ${error.status}).`;
@@ -162,6 +188,7 @@ export class AuthService {
       const role = candidate['role'];
 
       if (
+        typeof candidate['id'] !== 'string' ||
         typeof candidate['name'] !== 'string' ||
         typeof candidate['email'] !== 'string' ||
         (role !== 'public' && role !== 'admin')
@@ -170,6 +197,7 @@ export class AuthService {
       }
 
       return {
+        id: candidate['id'],
         name: candidate['name'],
         email: candidate['email'],
         role,

@@ -14,6 +14,7 @@ import { API_BASE_URL } from '../services/thesis.service';
 import { authInterceptor } from './auth.interceptor';
 
 const adminUser: AuthUser = {
+  id: '65f1d1f1f1f1f1f1f1f1f1f1f',
   name: 'Library Administrator',
   email: 'admin@ubaguio.edu',
   role: 'admin',

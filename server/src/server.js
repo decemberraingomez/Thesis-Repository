@@ -9,6 +9,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
+const { seedBootstrapAdmin } = require('./auth/bootstrapAdmin');
 const authRoutes = require('./routes/auth');
 const thesisRoutes = require('./routes/theses');
 
@@ -45,6 +46,14 @@ const startServer = async () => {
   try {
     await mongoose.connect(process.env.MONGODB_URI);
     console.log('Connected to MongoDB');
+
+    const bootstrap = await seedBootstrapAdmin();
+
+    if (bootstrap.created) {
+      console.log('Bootstrap admin created in MongoDB');
+    } else {
+      console.log('AdminUser collection already has an administrator');
+    }
 
     app.listen(port, () => console.log(`API running on port ${port}`));
   } catch (error) {

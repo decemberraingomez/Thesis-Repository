@@ -22,14 +22,21 @@ A web app where students, thesis advisers and library admins can search, view, a
 | Edit/update thesis records (FR4) | No, `401` | Yes |
 | Delete thesis records (FR5) | No, `401` | Yes |
 | Login/logout and admin session controls | No | Yes |
+| Change the admin password at runtime | No | Yes |
 
 Public Users see a read-only interface. Create/Edit routes are protected by an Angular
 functional guard, and every mutating API request is protected by the Express
 `requireAdmin` middleware.
 
-### Demo admin account
+### Database-backed admin account
 
-These non-secret demo credentials work out of the box and can be overridden in `.env`:
+Administrators are stored in the MongoDB `AdminUser` collection with a per-user salt and
+a `crypto.scrypt` password hash. The `.env` administrator values are a **one-time bootstrap
+only**: on startup, if no `AdminUser` exists, the server seeds one from `ADMIN_EMAIL`,
+`ADMIN_PASSWORD`, and `ADMIN_NAME`. If an administrator already exists, `.env` credentials
+are ignored and MongoDB remains the only login source.
+
+Demo bootstrap credentials:
 
 ```
 Email:    admin@ubaguio.edu
@@ -37,6 +44,17 @@ Password: ThesisAdmin2026!
 Name:     Library Administrator
 Role:     admin
 ```
+
+Admins can change their password at runtime from the navbar or through
+`PUT /api/auth/password`. For institutional turnover or a forgotten password, recover the
+account from the project root:
+
+```bash
+npm run admin:reset -- admin@ubaguio.edu ThesisAdmin2026!
+```
+
+`AUTH_SECRET` signs the HMAC-SHA256 session tokens. Rotating it in `.env` or the deployment
+secret manager immediately invalidates existing sessions.
 
 ## Tech stack
 
@@ -56,10 +74,12 @@ Angular (port 4200)  --HTTP/JSON-->  Express API (port 3000)  --Mongoose-->  Mon
 src/app/models/        Thesis interface
 src/app/services/      ThesisService (all HTTP calls)
 src/app/pages/         page components
-backend/models/        Mongoose Thesis schema
+backend/models/        Mongoose Thesis and AdminUser schemas
 backend/seeds/         seed script (10 sample theses)
+server/src/auth/       token signing, scrypt password hashing, bootstrap seed
+server/src/scripts/    admin password recovery CLI
 server/src/server.js   Express server
-server/src/routes/     /api/theses routes
+server/src/routes/     /api/auth and /api/theses routes
 ```
 
 ## Getting started
@@ -83,8 +103,9 @@ Run every command from the **project root**, not from inside `server/`.
    AUTH_SECRET=ub-thesis-repo-secret-2026
    ```
 
-   `.env` is git-ignored. Never commit it. The admin values above are demo defaults;
-   change `ADMIN_EMAIL`, `ADMIN_PASSWORD`, and `AUTH_SECRET` for real deployments.
+   `.env` is git-ignored. Never commit it. The admin values above are used only for the
+   one-time MongoDB bootstrap; change `AUTH_SECRET` for real deployments. After the first
+   startup, manage the admin through the app or `npm run admin:reset`.
 
 3. (Optional) Load the 10 sample theses. **This deletes all existing theses first.**
 
@@ -112,8 +133,9 @@ Run every command from the **project root**, not from inside `server/`.
 
 | Method | Endpoint | Access | Success | Errors |
 |---|---|---|---|---|
-| POST | `/api/auth/login` | Public | 200, token + admin profile | 401 |
-| GET | `/api/auth/me` | Admin | 200, current admin profile | 401, 403 |
+| POST | `/api/auth/login` | Public | 200, token + admin profile | 401, 403 (disabled) |
+| GET | `/api/auth/me` | Admin | 200, current DB admin profile | 401, 403 |
+| PUT | `/api/auth/password` | Admin | 200, password updated in MongoDB | 400, 401, 403 |
 | GET | `/api/theses` | Public | 200, list of theses | 500 |
 | GET | `/api/theses/:id` | Public | 200, one thesis | 400 (invalid id), 404, 500 |
 | POST | `/api/theses` | Admin | 201, the new thesis | 401, 403, 400, 500 |

@@ -33,6 +33,13 @@
           + Add thesis
         </a>
         <span class="nav__user">{{ authService.currentUser()?.name }}</span>
+        <button
+          type="button"
+          class="nav__link nav__action"
+          (click)="openPasswordDialog()"
+        >
+          Change password
+        </button>
         <button type="button" class="btn btn--ghost nav__cta" (click)="logout()">Logout</button>
       } @else {
         <a
@@ -55,3 +62,5 @@
     </div>
   }
 </header>
+
+<app-change-password [open]="passwordDialogOpen()" (closed)="closePasswordDialog()" />

@@ -6,24 +6,10 @@
 
 const crypto = require('crypto');
 
-const DEFAULT_ADMIN = Object.freeze({
-  name: 'Library Administrator',
-  email: 'admin@ubaguio.edu',
-  password: 'ThesisAdmin2026!',
-  role: 'admin',
-});
-
 const DEFAULT_AUTH_SECRET = 'ub-thesis-repo-secret-2026';
 const TOKEN_TTL_SECONDS = 60 * 60 * 8;
 
 const getAuthSecret = () => process.env.AUTH_SECRET || DEFAULT_AUTH_SECRET;
-
-const getAdminAccount = () => ({
-  name: process.env.ADMIN_NAME?.trim() || DEFAULT_ADMIN.name,
-  email: (process.env.ADMIN_EMAIL || DEFAULT_ADMIN.email).trim().toLowerCase(),
-  password: process.env.ADMIN_PASSWORD || DEFAULT_ADMIN.password,
-  role: DEFAULT_ADMIN.role,
-});
 
 const toBase64Url = (value) => Buffer.from(value).toString('base64url');
 
@@ -31,9 +17,15 @@ const sign = (value) =>
   crypto.createHmac('sha256', getAuthSecret()).update(value).digest('base64url');
 
 const createAuthToken = (account) => {
+  const accountId = account?.id ?? account?._id;
+
+  if (!accountId) {
+    throw new Error('Admin id is required to create a token');
+  }
+
   const issuedAt = Math.floor(Date.now() / 1000);
   const payload = {
-    sub: account.email,
+    id: String(accountId),
     email: account.email,
     name: account.name,
     role: account.role,
@@ -76,6 +68,7 @@ const verifyAuthToken = (token) => {
     if (
       typeof payload !== 'object' ||
       payload === null ||
+      typeof payload.id !== 'string' ||
       typeof payload.email !== 'string' ||
       typeof payload.role !== 'string' ||
       typeof payload.exp !== 'number'
@@ -111,7 +104,6 @@ const readBearerToken = (req) => {
 
 module.exports = {
   createAuthToken,
-  getAdminAccount,
   readBearerToken,
   verifyAuthToken,
 };

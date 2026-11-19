@@ -7,6 +7,7 @@
 export type UserRole = 'public' | 'admin';
 
 export interface AuthUser {
+  id: string;
   name: string;
   email: string;
   role: UserRole;
@@ -24,4 +25,13 @@ export interface LoginResponse {
 
 export interface AuthMeResponse {
   user: AuthUser;
+}
+
+export interface ChangePasswordRequest {
+  currentPassword: string;
+  newPassword: string;
+}
+
+export interface ChangePasswordResponse {
+  message: string;
 }
