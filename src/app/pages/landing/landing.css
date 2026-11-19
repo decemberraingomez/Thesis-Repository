@@ -87,36 +87,6 @@
   color: var(--muted);
 }
 
-.features {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1px;
-  padding: 0 24px;
-  border-top: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
-}
-
-.feature {
-  padding: 40px 24px;
-  border-right: 1px solid var(--border);
-}
-
-.feature:last-child {
-  border-right: 0;
-}
-
-.feature__title {
-  margin: 0;
-  font-size: 15px;
-  font-weight: 600;
-}
-
-.feature__text {
-  margin: 8px 0 0;
-  font-size: 14px;
-  color: var(--muted);
-}
-
 .stats {
   display: flex;
   justify-content: center;
