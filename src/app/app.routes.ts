@@ -1,5 +1,6 @@
 /**
- * Author: Jezreel M. Onos
+ * Author: Andrada, Jim Magnus C.
+ * Co-author: Jezreel M. Onos
  * Date: November 19, 2026
  * Assignment Title: CSAPPD1 Final Project - Thesis Repository Search Engine
  */
@@ -8,8 +9,9 @@ import { Routes } from '@angular/router';
 import { adminGuard } from './guards/admin.guard';
 
 export const routes: Routes = [
+  { path: '', redirectTo: 'home', pathMatch: 'full' },
   {
-    path: '',
+    path: 'home',
     loadComponent: () => import('./pages/landing/landing').then((m) => m.Landing),
   },
   {

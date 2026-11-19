@@ -1,11 +1,18 @@
 <!--
-  Author: Jezreel M. Onos
+  Author: Andrada, Jim Magnus C.
   Date: November 19, 2026
   Assignment Title: CSAPPD1 Final Project - Thesis Repository Search Engine
 -->
 
-@if (showNavbar()) {
-  <app-navbar />
-}
+<app-navbar />
 
-<router-outlet />
+<main class="shell">
+  <router-outlet />
+</main>
+
+<footer class="site-footer">
+  <div class="container site-footer__inner">
+    <span class="site-footer__copy">© 2026 Thesis Repository</span>
+    <a routerLink="/login" class="site-footer__link">Administrator</a>
+  </div>
+</footer>
