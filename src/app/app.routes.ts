@@ -1,14 +1,15 @@
 /**
- * Author: Jezreel M. Onos
- * Date: November 18, 2026
+ * Author: Andrada, Jim Magnus C.
+ * Date: November 19, 2026
  * Assignment Title: CSAPPD1 Final Project - Thesis Repository Search Engine
  */
 
 import { Routes } from '@angular/router';
 
 export const routes: Routes = [
+  { path: '', redirectTo: 'home', pathMatch: 'full' },
   {
-    path: '',
+    path: 'home',
     loadComponent: () => import('./pages/landing/landing').then((m) => m.Landing),
   },
   {
