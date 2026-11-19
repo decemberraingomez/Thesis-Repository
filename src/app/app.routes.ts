@@ -1,10 +1,11 @@
 /**
  * Author: Jezreel M. Onos
- * Date: November 18, 2026
+ * Date: November 19, 2026
  * Assignment Title: CSAPPD1 Final Project - Thesis Repository Search Engine
  */
 
 import { Routes } from '@angular/router';
+import { adminGuard } from './guards/admin.guard';
 
 export const routes: Routes = [
   {
@@ -17,10 +18,12 @@ export const routes: Routes = [
   },
   {
     path: 'theses/new',
+    canActivate: [adminGuard],
     loadComponent: () => import('./pages/thesis-form/thesis-form').then((m) => m.ThesisForm),
   },
   {
     path: 'theses/:id/edit',
+    canActivate: [adminGuard],
     loadComponent: () => import('./pages/thesis-form/thesis-form').then((m) => m.ThesisForm),
   },
   {

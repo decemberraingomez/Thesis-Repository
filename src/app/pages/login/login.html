@@ -1,7 +1,7 @@
 <!--
   Author: Jezreel M. Onos
-  Date: November 15, 2026
-  Assignment Title: CSAPPD1 Final Project - Thesis Repository
+  Date: November 19, 2026
+  Assignment Title: CSAPPD1 Final Project - Thesis Repository Search Engine
 -->
 
 <main class="auth">
@@ -12,27 +12,70 @@
       <h1 class="card__title">Administrator sign in</h1>
       <p class="card__text">Manage records, uploads, and moderation.</p>
 
-      <form class="form">
+      @if (errorMessage()) {
+        <div class="alert alert--error" role="alert">{{ errorMessage() }}</div>
+      }
+
+      <form class="form" [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
         <label class="field">
           <span class="field__label">Email</span>
-          <input class="input" type="email" placeholder="admin@example.com" autocomplete="username" />
+          <input
+            class="input"
+            type="email"
+            formControlName="email"
+            placeholder="admin@ubaguio.edu"
+            autocomplete="username"
+            [class.input--invalid]="showError(form.controls.email, 'required') || showError(form.controls.email, 'email')"
+          />
+          @if (showError(form.controls.email, 'required')) {
+            <span class="field__error">Email is required.</span>
+          }
+          @if (showError(form.controls.email, 'email')) {
+            <span class="field__error">Enter a valid email address.</span>
+          }
         </label>
 
         <label class="field">
           <span class="field__label">Password</span>
-          <input class="input" type="password" placeholder="••••••••" autocomplete="current-password" />
+          <input
+            class="input"
+            type="password"
+            formControlName="password"
+            placeholder="Enter your admin password"
+            autocomplete="current-password"
+            [class.input--invalid]="showError(form.controls.password, 'required') || showError(form.controls.password, 'minlength')"
+          />
+          @if (showError(form.controls.password, 'required')) {
+            <span class="field__error">Password is required.</span>
+          }
+          @if (showError(form.controls.password, 'minlength')) {
+            <span class="field__error">Password must be at least 6 characters.</span>
+          }
         </label>
 
         <div class="form__row">
           <label class="checkbox">
-            <input type="checkbox" />
+            <input type="checkbox" formControlName="remember" />
             Remember me
           </label>
-          <a href="#" class="form__link">Forgot password?</a>
         </div>
 
-        <button class="btn form__submit" type="submit">Sign in</button>
+        <button class="btn form__submit" type="submit" [disabled]="submitting()">
+          @if (submitting()) {
+            Signing in...
+          } @else {
+            Sign in
+          }
+        </button>
       </form>
+
+      <div class="demo">
+        <p class="demo__label">Demo administrator account</p>
+        <p class="demo__credentials">{{ demoEmail }} / {{ demoPassword }}</p>
+        <button type="button" class="btn btn--ghost demo__button" (click)="fillDemoCredentials()">
+          Fill Demo Admin Credentials
+        </button>
+      </div>
     </div>
 
     <p class="auth__back">
