@@ -1,7 +1,7 @@
 /**
  * Author: Jezreel M. Onos
- * Date: November 15, 2026
- * Assignment Title: CSAPPD1 Final Project - Thesis Repository
+ * Date: November 19, 2026
+ * Assignment Title: CSAPPD1 Final Project - Thesis Repository Search Engine
  */
 
 require('dotenv').config();
@@ -9,14 +9,22 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
+const { seedBootstrapAdmin } = require('./auth/bootstrapAdmin');
+const authRoutes = require('./routes/auth');
 const thesisRoutes = require('./routes/theses');
 
 const app = express();
-const port = 3000;
+const port = Number(process.env.PORT) || 3000;
 
-app.use(cors());
+app.use(
+  cors({
+    origin: true,
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  })
+);
 app.use(express.json());
 
+app.use('/api/auth', authRoutes);
 app.use('/api/theses', thesisRoutes);
 
 app.use((req, res) => {
@@ -38,6 +46,14 @@ const startServer = async () => {
   try {
     await mongoose.connect(process.env.MONGODB_URI);
     console.log('Connected to MongoDB');
+
+    const bootstrap = await seedBootstrapAdmin();
+
+    if (bootstrap.created) {
+      console.log('Bootstrap admin created in MongoDB');
+    } else {
+      console.log('AdminUser collection already has an administrator');
+    }
 
     app.listen(port, () => console.log(`API running on port ${port}`));
   } catch (error) {

@@ -1,9 +1,11 @@
 /**
  * Author: Andrada, Jim Magnus C.
+ * Co-author: Jezreel M. Onos
  * Date: November 19, 2026
  * Assignment Title: CSAPPD1 Final Project - Thesis Repository Search Engine
  */
 
+import { provideHttpClient } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
 import { App } from './app';
@@ -15,7 +17,7 @@ describe('App routing shell', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [App],
-      providers: [provideRouter(routes)],
+      providers: [provideRouter(routes), provideHttpClient()],
     }).compileComponents();
 
     router = TestBed.inject(Router);

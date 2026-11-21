@@ -1,7 +1,7 @@
 /**
  * Author: Jezreel M. Onos
- * Date: November 15, 2026
- * Assignment Title: CSAPPD1 Final Project - Thesis Repository
+ * Date: November 19, 2026
+ * Assignment Title: CSAPPD1 Final Project - Thesis Repository Search Engine
  */
 
 const express = require('express');
@@ -11,6 +11,7 @@ const {
   THESIS_CATEGORIES,
   THESIS_STATUSES,
 } = require('../../../backend/dist/models/Thesis.js');
+const { requireAdmin } = require('../middleware/requireAdmin');
 
 const router = express.Router();
 
@@ -115,7 +116,7 @@ router.get('/', async (req, res, next) => {
   }
 });
 
-router.post('/', async (req, res, next) => {
+router.post('/', requireAdmin, async (req, res, next) => {
   try {
     const validationErrors = validateThesisPayload(req.body);
 
@@ -148,7 +149,7 @@ router.get('/:id', async (req, res, next) => {
   }
 });
 
-router.put('/:id', async (req, res, next) => {
+const updateThesis = async (req, res, next) => {
   try {
     if (!mongoose.isValidObjectId(req.params.id)) {
       return res.status(400).json({ message: 'Invalid thesis id' });
@@ -173,9 +174,12 @@ router.put('/:id', async (req, res, next) => {
   } catch (error) {
     return next(error);
   }
-});
+};
 
-router.delete('/:id', async (req, res, next) => {
+router.put('/:id', requireAdmin, updateThesis);
+router.patch('/:id', requireAdmin, updateThesis);
+
+router.delete('/:id', requireAdmin, async (req, res, next) => {
   try {
     if (!mongoose.isValidObjectId(req.params.id)) {
       return res.status(400).json({ message: 'Invalid thesis id' });

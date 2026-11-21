@@ -1,5 +1,6 @@
 <!--
   Author: Andrada, Jim Magnus C.
+  Co-author: Jezreel M. Onos
   Date: November 19, 2026
   Assignment Title: CSAPPD1 Final Project - Thesis Repository Search Engine
 -->
@@ -20,17 +21,46 @@
       <a routerLink="/theses" routerLinkActive="nav__link--active" class="nav__link">
         Browse
       </a>
-      <a
-        routerLink="/theses/new"
-        routerLinkActive="nav__link--active"
-        [routerLinkActiveOptions]="{ exact: true }"
-        class="nav__link"
-      >
-        Add thesis
-      </a>
-      <a routerLink="/login" routerLinkActive="nav__link--active" class="btn btn--ghost nav__cta">
-        Admin login
-      </a>
+
+      @if (authService.isAdmin()) {
+        <span class="role-badge" role="status">Admin Mode</span>
+        <a
+          routerLink="/theses/new"
+          routerLinkActive="nav__link--active"
+          [routerLinkActiveOptions]="{ exact: true }"
+          class="nav__link nav__link--add"
+        >
+          + Add thesis
+        </a>
+        <span class="nav__user">{{ authService.currentUser()?.name }}</span>
+        <button
+          type="button"
+          class="nav__link nav__action"
+          (click)="openPasswordDialog()"
+        >
+          Change password
+        </button>
+        <button type="button" class="btn btn--ghost nav__cta" (click)="logout()">Logout</button>
+      } @else {
+        <a
+          routerLink="/login"
+          routerLinkActive="nav__link--active"
+          class="btn btn--ghost nav__cta"
+        >
+          Admin Login
+        </a>
+      }
     </nav>
   </div>
+
+  @if (authService.sessionNotice(); as notice) {
+    <div class="container notice">
+      <div class="alert alert--error" role="alert">
+        <span>{{ notice }}</span>
+        <button type="button" class="alert__dismiss" (click)="dismissNotice()">Dismiss</button>
+      </div>
+    </div>
+  }
 </header>
+
+<app-change-password [open]="passwordDialogOpen()" (closed)="closePasswordDialog()" />
