@@ -84,6 +84,7 @@ export class AuthService {
         ? 'Your account does not have permission to perform that action. Please sign in as an administrator.'
         : 'Your admin session has expired. Please sign in again.'
     );
+    this.redirectToLogin();
   }
 
   dismissNotice(): void {
@@ -175,6 +176,18 @@ export class AuthService {
     this.tokenState.set(null);
     this.userState.set(null);
     this.clearStoredSession();
+  }
+
+  private redirectToLogin(): void {
+    if (this.router.url === '/login') {
+      return;
+    }
+
+    try {
+      void this.router.navigate(['/login']).catch(() => false);
+    } catch {
+      return;
+    }
   }
 
   private clearStoredSession(): void {

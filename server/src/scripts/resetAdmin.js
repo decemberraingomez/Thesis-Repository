@@ -16,7 +16,10 @@ const { hashPassword } = require('../auth/password');
 const MIN_PASSWORD_LENGTH = 8;
 
 const readArguments = () => {
-  const args = process.argv.slice(2).filter((argument) => argument !== '--');
+  const args = process.argv
+    .slice(2)
+    .filter((argument) => argument !== '--')
+    .map((argument) => argument.replace(/\^!/g, '!'));
   return {
     email: args[0]?.trim() ?? '',
     password: args[1] ?? '',

@@ -15,6 +15,12 @@ const isApiRequest = (url: string): boolean =>
 
 const isLoginRequest = (url: string): boolean => url.includes('/auth/login');
 
+const isInvalidCurrentPassword = (error: HttpErrorResponse): boolean => {
+  const body = error.error as { code?: unknown } | null;
+
+  return typeof body === 'object' && body !== null && body.code === 'INVALID_CURRENT_PASSWORD';
+};
+
 export const authInterceptor: HttpInterceptorFn = (request, next) => {
   const authService = inject(AuthService);
   const token = authService.token();
@@ -30,6 +36,7 @@ export const authInterceptor: HttpInterceptorFn = (request, next) => {
         error instanceof HttpErrorResponse &&
         isApiRequest(request.url) &&
         !isLoginRequest(request.url) &&
+        !isInvalidCurrentPassword(error) &&
         (error.status === 401 || error.status === 403)
       ) {
         authService.notifyAuthFailure(error.status);

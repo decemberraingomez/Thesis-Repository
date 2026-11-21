@@ -7,7 +7,7 @@
 import { HttpClient, provideHttpClient, withInterceptors } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
+import { provideRouter, Router } from '@angular/router';
 import { AuthUser, LoginResponse } from '../models/auth.model';
 import { AuthService } from '../services/auth.service';
 import { API_BASE_URL } from '../services/thesis.service';
@@ -68,6 +68,8 @@ describe('authInterceptor', () => {
     const http = TestBed.inject(HttpTestingController);
     const authService = TestBed.inject(AuthService);
     const client = TestBed.inject(HttpClient);
+    const router = TestBed.inject(Router);
+    const navigateSpy = vi.spyOn(router, 'navigate').mockResolvedValue(true);
 
     loginAdmin(http, authService);
 
@@ -82,6 +84,36 @@ describe('authInterceptor', () => {
 
     expect(authService.isAdmin()).toBe(false);
     expect(authService.sessionNotice()).toContain('session has expired');
+    expect(navigateSpy).toHaveBeenCalledWith(['/login']);
+    http.verify();
+  });
+
+  it('keeps the admin session when only the current password is wrong', () => {
+    const http = TestBed.inject(HttpTestingController);
+    const authService = TestBed.inject(AuthService);
+    const client = TestBed.inject(HttpClient);
+
+    loginAdmin(http, authService);
+
+    client
+      .put(`${API_BASE_URL}/auth/password`, {
+        currentPassword: 'WrongPass2026!',
+        newPassword: 'UpdatedAdmin2026!',
+      })
+      .subscribe({ error: () => undefined });
+
+    http
+      .expectOne(`${API_BASE_URL}/auth/password`)
+      .flush(
+        {
+          code: 'INVALID_CURRENT_PASSWORD',
+          message: 'Current password is incorrect.',
+        },
+        { status: 401, statusText: 'Unauthorized' }
+      );
+
+    expect(authService.isAdmin()).toBe(true);
+    expect(authService.sessionNotice()).toBe('');
     http.verify();
   });
 });

@@ -135,6 +135,8 @@ describe('AuthService', () => {
   it('clears a stale token and publishes a notice after an auth failure', () => {
     const service = TestBed.inject(AuthService);
     const http = TestBed.inject(HttpTestingController);
+    const router = TestBed.inject(Router);
+    const navigateSpy = vi.spyOn(router, 'navigate').mockResolvedValue(true);
 
     service.login('admin@ubaguio.edu', 'ThesisAdmin2026!').subscribe();
     http
@@ -145,6 +147,7 @@ describe('AuthService', () => {
 
     expect(service.isAdmin()).toBe(false);
     expect(service.sessionNotice()).toContain('session has expired');
+    expect(navigateSpy).toHaveBeenCalledWith(['/login']);
     http.verify();
   });
 });

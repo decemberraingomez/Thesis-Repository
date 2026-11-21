@@ -105,7 +105,10 @@ router.put('/password', requireAdmin, async (req, res, next) => {
     }
 
     if (!verifyPassword(currentPassword, admin.passwordHash, admin.passwordSalt)) {
-      return res.status(401).json({ message: 'Current password is incorrect.' });
+      return res.status(401).json({
+        code: 'INVALID_CURRENT_PASSWORD',
+        message: 'Current password is incorrect.',
+      });
     }
 
     const { passwordHash, passwordSalt } = hashPassword(newPassword);
