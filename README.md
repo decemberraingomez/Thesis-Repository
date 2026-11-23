@@ -36,25 +36,30 @@ only**: on startup, if no `AdminUser` exists, the server seeds one from `ADMIN_E
 `ADMIN_PASSWORD`, and `ADMIN_NAME`. If an administrator already exists, `.env` credentials
 are ignored and MongoDB remains the only login source.
 
-Demo bootstrap credentials:
+Bootstrap credentials come only from your local, git-ignored `.env`:
 
 ```
-Email:    admin@ubaguio.edu
-Password: ThesisAdmin2026!
-Name:     Library Administrator
-Role:     admin
+ADMIN_EMAIL=admin@example.edu
+ADMIN_PASSWORD=replace-with-strong-bootstrap-password
+ADMIN_NAME=Library Administrator
 ```
+
+If `ADMIN_EMAIL` or `ADMIN_PASSWORD` is missing, the server skips the bootstrap seed and logs
+a clear message instead of creating a default account. No working administrator credentials
+are stored in this repository.
 
 Admins can change their password at runtime from the navbar or through
-`PUT /api/auth/password`. For institutional turnover or a forgotten password, recover the
-account from the project root:
+`PUT /api/auth/password`. Changing the password increments the account's `tokenVersion`, so
+every previously issued session token is rejected with `401` immediately. For institutional
+turnover or a forgotten password, recover the account from the project root:
 
 ```bash
-npm run admin:reset -- admin@ubaguio.edu ThesisAdmin2026!
+npm run admin:reset -- <email> <newPassword>
 ```
 
-`AUTH_SECRET` signs the HMAC-SHA256 session tokens. Rotating it in `.env` or the deployment
-secret manager immediately invalidates existing sessions.
+`AUTH_SECRET` is required and signs the HMAC-SHA256 session tokens; the API fails fast on
+startup if it is missing or empty. Rotating it in `.env` or the deployment secret manager
+immediately invalidates existing sessions.
 
 ## Tech stack
 
@@ -97,15 +102,16 @@ Run every command from the **project root**, not from inside `server/`.
    ```
    MONGODB_URI=your-mongodb-atlas-connection-string
    PORT=3000
-   ADMIN_EMAIL=admin@ubaguio.edu
-   ADMIN_PASSWORD=ThesisAdmin2026!
+   ADMIN_EMAIL=admin@example.edu
+   ADMIN_PASSWORD=replace-with-strong-bootstrap-password
    ADMIN_NAME=Library Administrator
-   AUTH_SECRET=ub-thesis-repo-secret-2026
+   AUTH_SECRET=replace-with-a-strong-random-secret
    ```
 
-   `.env` is git-ignored. Never commit it. The admin values above are used only for the
-   one-time MongoDB bootstrap; change `AUTH_SECRET` for real deployments. After the first
-   startup, manage the admin through the app or `npm run admin:reset`.
+   `.env` is git-ignored. Never commit it. Replace every placeholder with your own values;
+   the admin values are used only for the one-time MongoDB bootstrap, and `AUTH_SECRET` is
+   mandatory. After the first startup, manage the admin through the app or
+   `npm run admin:reset -- <email> <newPassword>`.
 
 3. (Optional) Load the 10 sample theses. **This deletes all existing theses first.**
 

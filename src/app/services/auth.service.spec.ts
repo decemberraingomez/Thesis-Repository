@@ -1,6 +1,6 @@
 /**
  * Author: Jezreel M. Onos
- * Date: November 19, 2026
+ * Date: November 23, 2026
  * Assignment Title: CSAPPD1 Final Project - Thesis Repository Search Engine
  */
 
@@ -55,13 +55,13 @@ describe('AuthService', () => {
     expect(service.isAdmin()).toBe(false);
     expect(service.role()).toBe('public');
 
-    service.login('admin@ubaguio.edu', 'ThesisAdmin2026!').subscribe();
+    service.login('admin@ubaguio.edu', 'TestAdminPass123!').subscribe();
 
     const request = http.expectOne(`${API_BASE_URL}/auth/login`);
     expect(request.request.method).toBe('POST');
     expect(request.request.body).toEqual({
       email: 'admin@ubaguio.edu',
-      password: 'ThesisAdmin2026!',
+      password: 'TestAdminPass123!',
     });
 
     request.flush(response);
@@ -101,7 +101,7 @@ describe('AuthService', () => {
     const router = TestBed.inject(Router);
     const navigateSpy = vi.spyOn(router, 'navigate').mockResolvedValue(true);
 
-    service.login('admin@ubaguio.edu', 'ThesisAdmin2026!').subscribe();
+    service.login('admin@ubaguio.edu', 'TestAdminPass123!').subscribe();
     http
       .expectOne(`${API_BASE_URL}/auth/login`)
       .flush({ token: 'signed-admin-token', user: adminUser } satisfies LoginResponse);
@@ -119,12 +119,12 @@ describe('AuthService', () => {
     const service = TestBed.inject(AuthService);
     const http = TestBed.inject(HttpTestingController);
 
-    service.changePassword('ThesisAdmin2026!', 'UpdatedAdmin2026!').subscribe();
+    service.changePassword('TestAdminPass123!', 'UpdatedAdmin2026!').subscribe();
 
     const request = http.expectOne(`${API_BASE_URL}/auth/password`);
     expect(request.request.method).toBe('PUT');
     expect(request.request.body).toEqual({
-      currentPassword: 'ThesisAdmin2026!',
+      currentPassword: 'TestAdminPass123!',
       newPassword: 'UpdatedAdmin2026!',
     });
 
@@ -138,7 +138,7 @@ describe('AuthService', () => {
     const router = TestBed.inject(Router);
     const navigateSpy = vi.spyOn(router, 'navigate').mockResolvedValue(true);
 
-    service.login('admin@ubaguio.edu', 'ThesisAdmin2026!').subscribe();
+    service.login('admin@ubaguio.edu', 'TestAdminPass123!').subscribe();
     http
       .expectOne(`${API_BASE_URL}/auth/login`)
       .flush({ token: 'signed-admin-token', user: adminUser } satisfies LoginResponse);

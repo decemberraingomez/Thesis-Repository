@@ -1,6 +1,6 @@
 /**
  * Author: Jezreel M. Onos
- * Date: November 19, 2026
+ * Date: November 23, 2026
  * Assignment Title: CSAPPD1 Final Project - Thesis Repository Search Engine
  */
 
@@ -31,7 +31,7 @@ const configure = (): void => {
 };
 
 const loginAdmin = (http: HttpTestingController, authService: AuthService): void => {
-  authService.login('admin@ubaguio.edu', 'ThesisAdmin2026!').subscribe();
+  authService.login('admin@ubaguio.edu', 'TestAdminPass123!').subscribe();
   http
     .expectOne(`${API_BASE_URL}/auth/login`)
     .flush({ token: 'signed-admin-token', user: adminUser } satisfies LoginResponse);

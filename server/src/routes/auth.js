@@ -1,9 +1,10 @@
 /**
  * Author: Jezreel M. Onos
- * Date: November 19, 2026
+ * Date: November 23, 2026
  * Assignment Title: CSAPPD1 Final Project - Thesis Repository Search Engine
  */
 
+const crypto = require('crypto');
 const express = require('express');
 const { AdminUser } = require('../../../backend/dist/models/AdminUser.js');
 const { createAuthToken } = require('../auth/token');
@@ -19,6 +20,11 @@ const router = express.Router();
 const INVALID_CREDENTIALS_MESSAGE = 'Invalid admin email or password.';
 const MIN_PASSWORD_LENGTH = 8;
 
+const DUMMY_PASSWORD_SALT = '00000000000000000000000000000000';
+const DUMMY_PASSWORD_HASH = crypto
+  .scryptSync('thesis-repository-timing-dummy-password', DUMMY_PASSWORD_SALT, 64)
+  .toString('hex');
+
 const readIdentifier = (body) => {
   if (typeof body !== 'object' || body === null) {
     return '';
@@ -26,10 +32,6 @@ const readIdentifier = (body) => {
 
   if (typeof body.email === 'string' && body.email.trim().length > 0) {
     return body.email.trim();
-  }
-
-  if (typeof body.username === 'string' && body.username.trim().length > 0) {
-    return body.username.trim();
   }
 
   return '';
@@ -54,6 +56,7 @@ router.post('/login', async (req, res, next) => {
     const admin = await AdminUser.findOne({ email: identifier.toLowerCase() }).exec();
 
     if (!admin) {
+      verifyPassword(password, DUMMY_PASSWORD_HASH, DUMMY_PASSWORD_SALT);
       return res.status(401).json({ message: INVALID_CREDENTIALS_MESSAGE });
     }
 
@@ -114,6 +117,7 @@ router.put('/password', requireAdmin, async (req, res, next) => {
     const { passwordHash, passwordSalt } = hashPassword(newPassword);
     admin.passwordHash = passwordHash;
     admin.passwordSalt = passwordSalt;
+    admin.tokenVersion = Number(admin.tokenVersion ?? 0) + 1;
     await admin.save();
 
     return res.status(200).json({ message: 'Admin password updated successfully.' });

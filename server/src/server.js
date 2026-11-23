@@ -1,6 +1,6 @@
 /**
  * Author: Jezreel M. Onos
- * Date: November 19, 2026
+ * Date: November 23, 2026
  * Assignment Title: CSAPPD1 Final Project - Thesis Repository Search Engine
  */
 
@@ -10,6 +10,7 @@ const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const { seedBootstrapAdmin } = require('./auth/bootstrapAdmin');
+const { assertAuthSecret } = require('./auth/token');
 const authRoutes = require('./routes/auth');
 const thesisRoutes = require('./routes/theses');
 
@@ -44,6 +45,8 @@ app.use((error, req, res, next) => {
 
 const startServer = async () => {
   try {
+    assertAuthSecret();
+
     await mongoose.connect(process.env.MONGODB_URI);
     console.log('Connected to MongoDB');
 
@@ -51,13 +54,17 @@ const startServer = async () => {
 
     if (bootstrap.created) {
       console.log('Bootstrap admin created in MongoDB');
+    } else if (bootstrap.skipped) {
+      console.log(
+        'Skipping admin bootstrap: set ADMIN_EMAIL and ADMIN_PASSWORD in .env to seed the first administrator.'
+      );
     } else {
       console.log('AdminUser collection already has an administrator');
     }
 
     app.listen(port, () => console.log(`API running on port ${port}`));
   } catch (error) {
-    console.error('MongoDB connection failed:', error.message);
+    console.error('API startup failed:', error.message);
     process.exit(1);
   }
 };

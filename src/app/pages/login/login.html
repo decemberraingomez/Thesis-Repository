@@ -1,6 +1,6 @@
 <!--
   Author: Jezreel M. Onos
-  Date: November 19, 2026
+  Date: November 23, 2026
   Assignment Title: CSAPPD1 Final Project - Thesis Repository Search Engine
 -->
 
@@ -23,7 +23,7 @@
             class="input"
             type="email"
             formControlName="email"
-            placeholder="admin@ubaguio.edu"
+            placeholder="admin@example.edu"
             autocomplete="username"
             [class.input--invalid]="showError(form.controls.email, 'required') || showError(form.controls.email, 'email')"
           />
@@ -68,14 +68,6 @@
           }
         </button>
       </form>
-
-      <div class="demo">
-        <p class="demo__label">Demo administrator account</p>
-        <p class="demo__credentials">{{ demoEmail }} / {{ demoPassword }}</p>
-        <button type="button" class="btn btn--ghost demo__button" (click)="fillDemoCredentials()">
-          Fill Demo Admin Credentials
-        </button>
-      </div>
     </div>
 
     <p class="auth__back">

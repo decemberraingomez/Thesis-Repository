@@ -1,6 +1,6 @@
 /**
  * Author: Jezreel M. Onos
- * Date: November 19, 2026
+ * Date: November 23, 2026
  * Assignment Title: CSAPPD1 Final Project - Thesis Repository Search Engine
  */
 
@@ -26,9 +26,12 @@ interface LoginTestApi {
 const adminUser: AuthUser = {
   id: '65f1d1f1f1f1f1f1f1f1f1f1f',
   name: 'Library Administrator',
-  email: 'admin@ubaguio.edu',
+  email: 'admin@example.edu',
   role: 'admin',
 };
+
+const TEST_EMAIL = 'admin@example.edu';
+const TEST_PASSWORD = 'TestAdminPass123!';
 
 describe('Login', () => {
   beforeEach(() => {
@@ -54,7 +57,20 @@ describe('Login', () => {
     sessionStorage.clear();
   });
 
-  it('fills the demo credentials and completes the admin login flow', () => {
+  it('renders no demo credentials or autofill control', () => {
+    const fixture = TestBed.createComponent(Login);
+
+    fixture.detectChanges();
+
+    const host = fixture.nativeElement as HTMLElement;
+    const buttons = Array.from(host.querySelectorAll('button'));
+
+    expect(buttons).toHaveLength(1);
+    expect(host.textContent?.toLowerCase()).not.toContain('demo');
+    expect(host.textContent).not.toContain('TestAdminPass123!');
+  });
+
+  it('completes the admin login flow from manually entered credentials', () => {
     const fixture = TestBed.createComponent(Login);
     const http = TestBed.inject(HttpTestingController);
     const router = TestBed.inject(Router);
@@ -62,17 +78,8 @@ describe('Login', () => {
 
     fixture.detectChanges();
 
-    const host = fixture.nativeElement as HTMLElement;
-    const fillButton = Array.from(host.querySelectorAll('button')).find((button) =>
-      button.textContent?.includes('Fill Demo Admin Credentials')
-    );
-    expect(fillButton).not.toBeUndefined();
-    fillButton?.click();
-    fixture.detectChanges();
-
     const api = fixture.componentInstance as unknown as LoginTestApi;
-    expect(api.form.controls['email'].value).toBe('admin@ubaguio.edu');
-    expect(api.form.controls['password'].value).toBe('ThesisAdmin2026!');
+    api.form.setValue({ email: TEST_EMAIL, password: TEST_PASSWORD, remember: true });
 
     api.onSubmit();
 
@@ -93,7 +100,7 @@ describe('Login', () => {
     fixture.detectChanges();
 
     api.form.patchValue({
-      email: 'admin@ubaguio.edu',
+      email: TEST_EMAIL,
       password: 'wrong-password',
     });
     api.onSubmit();

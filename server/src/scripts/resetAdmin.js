@@ -1,6 +1,6 @@
 /**
  * Author: Jezreel M. Onos
- * Date: November 19, 2026
+ * Date: November 23, 2026
  * Assignment Title: CSAPPD1 Final Project - Thesis Repository Search Engine
  */
 
@@ -8,9 +8,7 @@ require('dotenv').config();
 
 const mongoose = require('mongoose');
 const { AdminUser } = require('../../../backend/dist/models/AdminUser.js');
-const {
-  getBootstrapAdminCredentials,
-} = require('../auth/bootstrapAdmin');
+const { DEFAULT_ADMIN_NAME } = require('../auth/bootstrapAdmin');
 const { hashPassword } = require('../auth/password');
 
 const MIN_PASSWORD_LENGTH = 8;
@@ -21,7 +19,7 @@ const readArguments = () => {
     .filter((argument) => argument !== '--')
     .map((argument) => argument.replace(/\^!/g, '!'));
   return {
-    email: args[0]?.trim() ?? '',
+    email: args[0]?.trim().toLowerCase() ?? '',
     password: args[1] ?? '',
   };
 };
@@ -31,15 +29,17 @@ const main = async () => {
     throw new Error('MONGODB_URI is required to reset an administrator.');
   }
 
-  const defaults = getBootstrapAdminCredentials();
-  const args = readArguments();
-  const email = (args.email || defaults.email).trim().toLowerCase();
-  const password = args.password || defaults.password;
-  const name = defaults.name;
+  const { email, password } = readArguments();
+
+  if (!email) {
+    throw new Error('An administrator email is required: npm run admin:reset -- <email> <password>');
+  }
 
   if (password.length < MIN_PASSWORD_LENGTH) {
     throw new Error(`Password must be at least ${MIN_PASSWORD_LENGTH} characters.`);
   }
+
+  const name = process.env.ADMIN_NAME?.trim() || DEFAULT_ADMIN_NAME;
 
   await mongoose.connect(process.env.MONGODB_URI);
 
@@ -50,6 +50,7 @@ const main = async () => {
   if (existingAdmin) {
     existingAdmin.passwordHash = passwordHash;
     existingAdmin.passwordSalt = passwordSalt;
+    existingAdmin.tokenVersion = Number(existingAdmin.tokenVersion ?? 0) + 1;
     existingAdmin.isActive = true;
     await existingAdmin.save();
   } else {
@@ -59,6 +60,7 @@ const main = async () => {
       role: 'admin',
       passwordHash,
       passwordSalt,
+      tokenVersion: 0,
       isActive: true,
     });
     action = 'created';

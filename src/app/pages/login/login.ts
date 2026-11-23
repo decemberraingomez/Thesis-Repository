@@ -1,6 +1,6 @@
 /**
  * Author: Jezreel M. Onos
- * Date: November 19, 2026
+ * Date: November 23, 2026
  * Assignment Title: CSAPPD1 Final Project - Thesis Repository Search Engine
  */
 
@@ -8,9 +8,6 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { AbstractControl, FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
-
-const DEMO_EMAIL = 'admin@ubaguio.edu';
-const DEMO_PASSWORD = 'ThesisAdmin2026!';
 
 @Component({
   imports: [ReactiveFormsModule, RouterLink],
@@ -24,8 +21,6 @@ export class Login implements OnInit {
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
 
-  protected readonly demoEmail = DEMO_EMAIL;
-  protected readonly demoPassword = DEMO_PASSWORD;
   protected readonly submitting = signal(false);
   protected readonly errorMessage = signal('');
 
@@ -49,12 +44,6 @@ export class Login implements OnInit {
 
   protected showError(control: AbstractControl, error: string): boolean {
     return (control.touched || control.dirty) && control.hasError(error);
-  }
-
-  protected fillDemoCredentials(): void {
-    this.form.patchValue({ email: DEMO_EMAIL, password: DEMO_PASSWORD });
-    this.form.markAsDirty();
-    this.errorMessage.set('');
   }
 
   protected onSubmit(): void {

@@ -1,15 +1,29 @@
 /**
  * Author: Jezreel M. Onos
- * Date: November 19, 2026
+ * Date: November 23, 2026
  * Assignment Title: CSAPPD1 Final Project - Thesis Repository Search Engine
  */
 
 const crypto = require('crypto');
 
-const DEFAULT_AUTH_SECRET = 'ub-thesis-repo-secret-2026';
 const TOKEN_TTL_SECONDS = 60 * 60 * 8;
+const MISSING_SECRET_MESSAGE =
+  'AUTH_SECRET environment variable is required to sign and verify admin tokens.';
 
-const getAuthSecret = () => process.env.AUTH_SECRET || DEFAULT_AUTH_SECRET;
+const getAuthSecret = () => {
+  const secret = process.env.AUTH_SECRET;
+
+  if (typeof secret !== 'string' || secret.trim().length === 0) {
+    throw new Error(MISSING_SECRET_MESSAGE);
+  }
+
+  return secret.trim();
+};
+
+const assertAuthSecret = () => {
+  getAuthSecret();
+  return true;
+};
 
 const toBase64Url = (value) => Buffer.from(value).toString('base64url');
 
@@ -29,6 +43,7 @@ const createAuthToken = (account) => {
     email: account.email,
     name: account.name,
     role: account.role,
+    tokenVersion: Number(account.tokenVersion ?? 0),
     iat: issuedAt,
     exp: issuedAt + TOKEN_TTL_SECONDS,
   };
@@ -71,6 +86,8 @@ const verifyAuthToken = (token) => {
       typeof payload.id !== 'string' ||
       typeof payload.email !== 'string' ||
       typeof payload.role !== 'string' ||
+      typeof payload.tokenVersion !== 'number' ||
+      !Number.isInteger(payload.tokenVersion) ||
       typeof payload.exp !== 'number'
     ) {
       return null;
@@ -103,6 +120,7 @@ const readBearerToken = (req) => {
 };
 
 module.exports = {
+  assertAuthSecret,
   createAuthToken,
   readBearerToken,
   verifyAuthToken,

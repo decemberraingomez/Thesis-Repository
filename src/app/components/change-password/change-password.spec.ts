@@ -1,6 +1,6 @@
 /**
  * Author: Jezreel M. Onos
- * Date: November 19, 2026
+ * Date: November 23, 2026
  * Assignment Title: CSAPPD1 Final Project - Thesis Repository Search Engine
  */
 
@@ -45,7 +45,7 @@ describe('ChangePassword', () => {
 
     const api = fixture.componentInstance as unknown as ChangePasswordTestApi;
     api.form.setValue({
-      currentPassword: 'ThesisAdmin2026!',
+      currentPassword: 'TestAdminPass123!',
       newPassword: 'UpdatedAdmin2026!',
       confirmPassword: 'UpdatedAdmin2026!',
     });
@@ -54,7 +54,7 @@ describe('ChangePassword', () => {
     const request = http.expectOne(`${API_BASE_URL}/auth/password`);
     expect(request.request.method).toBe('PUT');
     expect(request.request.body).toEqual({
-      currentPassword: 'ThesisAdmin2026!',
+      currentPassword: 'TestAdminPass123!',
       newPassword: 'UpdatedAdmin2026!',
     });
 
@@ -77,7 +77,7 @@ describe('ChangePassword', () => {
 
     const api = fixture.componentInstance as unknown as ChangePasswordTestApi;
     api.form.setValue({
-      currentPassword: 'ThesisAdmin2026!',
+      currentPassword: 'TestAdminPass123!',
       newPassword: 'UpdatedAdmin2026!',
       confirmPassword: 'DifferentAdmin2026!',
     });

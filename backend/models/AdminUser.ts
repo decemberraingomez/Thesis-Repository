@@ -1,6 +1,6 @@
 /**
  * Author: Jezreel M. Onos
- * Date: November 19, 2026
+ * Date: November 23, 2026
  * Assignment Title: CSAPPD1 Final Project - Thesis Repository Search Engine
  */
 
@@ -14,6 +14,7 @@ export interface IAdminUser extends Document {
   role: AdminRole;
   passwordHash: string;
   passwordSalt: string;
+  tokenVersion: number;
   isActive: boolean;
   createdAt?: Date;
   updatedAt?: Date;
@@ -50,6 +51,12 @@ const adminUserSchema = new Schema<IAdminUser>(
     passwordSalt: {
       type: String,
       required: [true, 'Admin password salt is required'],
+    },
+    tokenVersion: {
+      type: Number,
+      required: true,
+      default: 0,
+      min: 0,
     },
     isActive: {
       type: Boolean,

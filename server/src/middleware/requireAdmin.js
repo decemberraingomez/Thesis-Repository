@@ -1,6 +1,6 @@
 /**
  * Author: Jezreel M. Onos
- * Date: November 19, 2026
+ * Date: November 23, 2026
  * Assignment Title: CSAPPD1 Final Project - Thesis Repository Search Engine
  */
 
@@ -42,6 +42,10 @@ const requireAdmin = async (req, res, next) => {
 
     if (admin.role !== 'admin') {
       return res.status(403).json({ message: FORBIDDEN_MESSAGE });
+    }
+
+    if (payload.tokenVersion !== Number(admin.tokenVersion ?? 0)) {
+      return res.status(401).json({ message: MISSING_TOKEN_MESSAGE });
     }
 
     req.authUser = {
