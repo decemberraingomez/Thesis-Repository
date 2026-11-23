@@ -1,6 +1,6 @@
 /**
  * Author: Jezreel M. Onos
- * Date: November 18, 2026
+ * Date: November 19, 2026
  * Assignment Title: CSAPPD1 Final Project - Thesis Repository Search Engine
  */
 
@@ -8,6 +8,7 @@ import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ConfirmDialog } from '../../components/confirm-dialog/confirm-dialog';
 import { Thesis } from '../../models/thesis.model';
+import { AuthService } from '../../services/auth.service';
 import {
   ExternalReferenceService,
   ReferenceMetadata,
@@ -25,6 +26,7 @@ export class ThesisDetail implements OnInit {
   private readonly router = inject(Router);
   private readonly thesisService = inject(ThesisService);
   private readonly referenceService = inject(ExternalReferenceService);
+  protected readonly authService = inject(AuthService);
 
   protected readonly thesis = signal<Thesis | null>(null);
   protected readonly loading = signal(true);
@@ -84,6 +86,11 @@ export class ThesisDetail implements OnInit {
   }
 
   protected openDeleteDialog(): void {
+    if (!this.authService.isAdmin()) {
+      this.actionError.set('Administrator login is required to delete thesis records.');
+      return;
+    }
+
     if (!this.deleting()) {
       this.deleteDialogOpen.set(true);
       this.actionError.set('');
@@ -97,6 +104,12 @@ export class ThesisDetail implements OnInit {
   }
 
   protected confirmDelete(): void {
+    if (!this.authService.isAdmin()) {
+      this.deleteDialogOpen.set(false);
+      this.actionError.set('Administrator login is required to delete thesis records.');
+      return;
+    }
+
     const record = this.thesis();
 
     if (!record?._id) {

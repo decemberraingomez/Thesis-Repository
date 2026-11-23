@@ -1,7 +1,7 @@
 /**
  * Author: Jezreel M. Onos
- * Date: November 15, 2026
- * Assignment Title: CSAPPD1 Final Project - Thesis Repository
+ * Date: November 23, 2026
+ * Assignment Title: CSAPPD1 Final Project - Thesis Repository Search Engine
  */
 
 :host {
@@ -91,18 +91,33 @@
   accent-color: var(--text);
 }
 
-.form__link {
-  font-size: 13px;
-  color: var(--muted);
-}
-
-.form__link:hover {
-  color: var(--text);
-}
-
 .form__submit {
   width: 100%;
   margin-top: 4px;
+}
+
+.form__submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.field__error {
+  font-size: 12px;
+  color: #b91c1c;
+}
+
+.input--invalid {
+  border-color: #fca5a5;
+}
+
+.alert {
+  margin-top: 20px;
+  padding: 12px 14px;
+  border: 1px solid #fca5a5;
+  border-radius: var(--radius);
+  background: #fef2f2;
+  color: #991b1b;
+  font-size: 13px;
 }
 
 .auth__back {

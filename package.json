@@ -7,9 +7,11 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
+    "test:server": "node --test server/src/auth/token.test.js",
     "build:backend": "tsc -p backend",
     "api": "npm run build:backend && node server/src/server.js",
     "api:dev": "nodemon --watch server --watch backend/models --watch backend/seeds --ext js,ts --ignore backend/dist --exec \"npm run build:backend && node server/src/server.js\"",
+    "admin:reset": "npm run build:backend && node server/src/scripts/resetAdmin.js",
     "seed": "npm run build:backend && node backend/dist/seeds/seedThesis.js"
   },
   "private": true,

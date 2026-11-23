@@ -1,6 +1,6 @@
 /**
  * Author: Jezreel M. Onos
- * Date: November 18, 2026
+ * Date: November 19, 2026
  * Assignment Title: CSAPPD1 Final Project - Thesis Repository Search Engine
  */
 
@@ -9,7 +9,26 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { Thesis } from '../../models/thesis.model';
+import {
+  AUTH_TOKEN_STORAGE_KEY,
+  AUTH_USER_STORAGE_KEY,
+} from '../../services/auth.service';
 import { ThesesList } from './theses-list';
+
+const seedAdminSession = (): void => {
+  const expiration = Math.floor(Date.now() / 1000) + 3600;
+  const payload = btoa(JSON.stringify({ exp: expiration }));
+  localStorage.setItem(AUTH_TOKEN_STORAGE_KEY, `${payload}.test-signature`);
+  localStorage.setItem(
+    AUTH_USER_STORAGE_KEY,
+    JSON.stringify({
+      id: '65f1d1f1f1f1f1f1f1f1f1f1f',
+      name: 'Library Administrator',
+      email: 'admin@ubaguio.edu',
+      role: 'admin',
+    })
+  );
+};
 
 const sampleThesis: Thesis = {
   _id: '65f1d1f1f1f1f1f1f1f1f1f1',
@@ -31,6 +50,17 @@ const configure = (): void => {
 };
 
 describe('ThesesList', () => {
+  beforeEach(() => {
+    localStorage.clear();
+    sessionStorage.clear();
+    seedAdminSession();
+  });
+
+  afterEach(() => {
+    localStorage.clear();
+    sessionStorage.clear();
+  });
+
   it('requires confirmation before deleting and removes the row after success', () => {
     configure();
 

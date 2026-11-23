@@ -1,6 +1,6 @@
 <!--
   Author: Jezreel M. Onos
-  Date: November 18, 2026
+  Date: November 19, 2026
   Assignment Title: CSAPPD1 Final Project - Thesis Repository Search Engine
 -->
 
@@ -9,10 +9,13 @@
     <div>
       <h1 class="page__title">Thesis repository</h1>
       <p class="page__text">
-        Browse, edit, and remove thesis records stored in MongoDB through the internal API.
+        Browse and search thesis records stored in MongoDB. Only administrators can create,
+        edit, or delete records.
       </p>
     </div>
-    <a routerLink="/theses/new" class="btn">Add thesis</a>
+    @if (authService.isAdmin()) {
+      <a routerLink="/theses/new" class="btn">Add thesis</a>
+    }
   </div>
 
   @if (successMessage()) {
@@ -51,12 +54,16 @@
       <p class="empty__title">No thesis records found.</p>
       <p class="empty__text">
         @if (theses().length === 0) {
-          The repository is empty. Add your first thesis to get started.
+          The repository is empty.@if (authService.isAdmin()) {
+            Add your first thesis to get started.
+          }
         } @else {
           Try a different filter term.
         }
       </p>
-      <a routerLink="/theses/new" class="btn">Add thesis</a>
+      @if (authService.isAdmin()) {
+        <a routerLink="/theses/new" class="btn">Add thesis</a>
+      }
     </div>
   } @else {
     <ul class="record-list">
@@ -84,32 +91,36 @@
             <a routerLink="/theses/{{ thesis._id }}" class="btn btn--ghost record__button">
               View
             </a>
-            <a routerLink="/theses/{{ thesis._id }}/edit" class="btn btn--ghost record__button">
-              Edit
-            </a>
-            <button
-              type="button"
-              class="btn btn--ghost btn--danger record__button"
-              [disabled]="deleting()"
-              (click)="requestDelete(thesis)"
-            >
-              Delete
-            </button>
+            @if (authService.isAdmin()) {
+              <a routerLink="/theses/{{ thesis._id }}/edit" class="btn btn--ghost record__button">
+                Edit
+              </a>
+              <button
+                type="button"
+                class="btn btn--ghost btn--danger record__button"
+                [disabled]="deleting()"
+                (click)="requestDelete(thesis)"
+              >
+                Delete
+              </button>
+            }
           </div>
         </li>
       }
     </ul>
   }
 
-  <app-confirm-dialog
-    [open]="deleteDialogOpen()"
-    [busy]="deleting()"
-    [title]="'Delete thesis?'"
-    [message]="deleteMessage()"
-    [confirmLabel]="'Delete thesis'"
-    [cancelLabel]="'Keep thesis'"
-    [variant]="'danger'"
-    (confirmed)="confirmDelete()"
-    (cancelled)="cancelDelete()"
-  />
+  @if (authService.isAdmin()) {
+    <app-confirm-dialog
+      [open]="deleteDialogOpen()"
+      [busy]="deleting()"
+      [title]="'Delete thesis?'"
+      [message]="deleteMessage()"
+      [confirmLabel]="'Delete thesis'"
+      [cancelLabel]="'Keep thesis'"
+      [variant]="'danger'"
+      (confirmed)="confirmDelete()"
+      (cancelled)="cancelDelete()"
+    />
+  }
 </main>
