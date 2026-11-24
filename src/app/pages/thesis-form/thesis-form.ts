@@ -26,6 +26,8 @@ import { ThesisInput, ThesisService } from '../../services/thesis.service';
 
 const MAX_YEAR = new Date().getFullYear() + 1;
 
+const SUCCESS_REDIRECT_DELAY_MS = 2000;
+
 const AUTHOR_VALIDATORS = [Validators.required, Validators.maxLength(120)];
 
 @Component({
@@ -187,7 +189,7 @@ export class ThesisForm implements OnInit {
         const destination = targetId ? ['/theses', targetId] : ['/theses'];
         window.setTimeout(() => {
           void this.router.navigate(destination);
-        }, 900);
+        }, SUCCESS_REDIRECT_DELAY_MS);
       },
       error: (error: unknown) => {
         this.submitting.set(false);
