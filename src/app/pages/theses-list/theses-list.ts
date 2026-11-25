@@ -56,7 +56,7 @@ export class ThesesList implements OnInit {
   protected readonly deleteMessage = computed(() => {
     const thesis = this.pendingDelete();
     const title = thesis ? `"${thesis.title}"` : 'this thesis';
-    return `Delete ${title}? This permanently removes the record from MongoDB.`;
+    return `Delete ${title}? This permanently deletes the record from the repository.`;
   });
 
   ngOnInit(): void {
