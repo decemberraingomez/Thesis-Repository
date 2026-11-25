@@ -1,10 +1,10 @@
 /**
  * Author: Jezreel M. Onos
- * Date: November 19, 2026
+ * Date: November 25, 2026
  * Assignment Title: CSAPPD1 Final Project - Thesis Repository Search Engine
  */
 
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import {
   AbstractControl,
   FormArray,
@@ -42,6 +42,17 @@ export class ThesisForm implements OnInit {
   private readonly referenceService = inject(ExternalReferenceService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly destroyRef = inject(DestroyRef);
+  private redirectTimer: number | null = null;
+
+  constructor() {
+    this.destroyRef.onDestroy(() => {
+      if (this.redirectTimer !== null) {
+        window.clearTimeout(this.redirectTimer);
+        this.redirectTimer = null;
+      }
+    });
+  }
 
   protected readonly categories = THESIS_CATEGORIES;
   protected readonly statuses = THESIS_STATUSES;
@@ -187,7 +198,13 @@ export class ThesisForm implements OnInit {
         this.successMessage.set(message);
         const targetId = thesis._id ?? id;
         const destination = targetId ? ['/theses', targetId] : ['/theses'];
-        window.setTimeout(() => {
+
+        if (this.redirectTimer !== null) {
+          window.clearTimeout(this.redirectTimer);
+        }
+
+        this.redirectTimer = window.setTimeout(() => {
+          this.redirectTimer = null;
           void this.router.navigate(destination);
         }, SUCCESS_REDIRECT_DELAY_MS);
       },
