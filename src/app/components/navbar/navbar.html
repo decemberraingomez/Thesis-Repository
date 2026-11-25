@@ -1,34 +1,60 @@
 <!--
   Author: Andrada, Jim Magnus C.
   Co-author: Jezreel M. Onos
-  Date: November 19, 2026
+  Date: November 24, 2026
   Assignment Title: CSAPPD1 Final Project - Thesis Repository Search Engine
 -->
 
 <header class="site-header">
   <div class="container site-header__inner">
-    <a routerLink="/home" class="brand">Thesis Repository</a>
+    <a routerLink="/home" class="brand" (click)="closeMenu()">Thesis Repository</a>
 
-    <nav class="nav" aria-label="Primary">
+    <button
+      type="button"
+      class="menu-toggle"
+      [class.menu-toggle--open]="menuOpen()"
+      [attr.aria-expanded]="menuOpen()"
+      aria-controls="primary-navigation"
+      aria-label="Toggle navigation"
+      (click)="toggleMenu()"
+    >
+      <span class="menu-toggle__bar"></span>
+      <span class="menu-toggle__bar"></span>
+      <span class="menu-toggle__bar"></span>
+    </button>
+
+    <nav
+      id="primary-navigation"
+      class="nav"
+      [class.nav--open]="menuOpen()"
+      aria-label="Primary"
+    >
       <a
         routerLink="/home"
         routerLinkActive="nav__link--active"
         [routerLinkActiveOptions]="{ exact: true }"
         class="nav__link"
+        (click)="closeMenu()"
       >
         Home
       </a>
-      <a routerLink="/theses" routerLinkActive="nav__link--active" class="nav__link">
+      <a
+        routerLink="/theses"
+        routerLinkActive="nav__link--active"
+        class="nav__link"
+        (click)="closeMenu()"
+      >
         Browse
       </a>
 
       @if (authService.isAdmin()) {
-        <span class="role-badge" role="status">Admin Mode</span>
+        <span class="role-badge">Admin Mode</span>
         <a
           routerLink="/theses/new"
           routerLinkActive="nav__link--active"
           [routerLinkActiveOptions]="{ exact: true }"
           class="nav__link nav__link--add"
+          (click)="closeMenu()"
         >
           + Add thesis
         </a>
@@ -46,6 +72,7 @@
           routerLink="/login"
           routerLinkActive="nav__link--active"
           class="btn btn--ghost nav__cta"
+          (click)="closeMenu()"
         >
           Admin Login
         </a>

@@ -5,15 +5,16 @@
  */
 
 :host {
-  display: block;
-  min-height: 100%;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
 }
 
 .auth {
   display: flex;
+  flex: 1;
   align-items: center;
   justify-content: center;
-  min-height: calc(100dvh - 64px);
   padding: 48px 24px;
 }
 

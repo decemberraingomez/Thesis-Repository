@@ -1,7 +1,7 @@
 /**
  * Author: Andrada, Jim Magnus C.
  * Co-author: Jezreel M. Onos
- * Date: November 19, 2026
+ * Date: November 24, 2026
  * Assignment Title: CSAPPD1 Final Project - Thesis Repository Search Engine
  */
 
@@ -19,9 +19,19 @@ import { ChangePassword } from '../change-password/change-password';
 export class Navbar {
   protected readonly authService = inject(AuthService);
   protected readonly passwordDialogOpen = signal(false);
+  protected readonly menuOpen = signal(false);
+
+  protected toggleMenu(): void {
+    this.menuOpen.update((open) => !open);
+  }
+
+  protected closeMenu(): void {
+    this.menuOpen.set(false);
+  }
 
   protected openPasswordDialog(): void {
     this.passwordDialogOpen.set(true);
+    this.closeMenu();
   }
 
   protected closePasswordDialog(): void {
@@ -29,6 +39,7 @@ export class Navbar {
   }
 
   protected logout(): void {
+    this.closeMenu();
     this.authService.logout();
   }
 
