@@ -1,6 +1,6 @@
 /**
  * Author: Jezreel M. Onos
- * Date: November 23, 2026
+ * Date: November 25, 2026
  * Assignment Title: CSAPPD1 Final Project - Thesis Repository Search Engine
  */
 
@@ -62,7 +62,23 @@ const startServer = async () => {
       console.log('AdminUser collection already has an administrator');
     }
 
-    app.listen(port, () => console.log(`API running on port ${port}`));
+    const server = app.listen(port, () => console.log(`API running on port ${port}`));
+
+    const shutdown = async (signal) => {
+      console.log(`${signal} received, shutting down gracefully`);
+
+      const forceExit = setTimeout(() => process.exit(1), 10000);
+      forceExit.unref();
+
+      server.close(async () => {
+        await mongoose.disconnect().catch(() => undefined);
+        clearTimeout(forceExit);
+        process.exit(0);
+      });
+    };
+
+    process.once('SIGINT', () => void shutdown('SIGINT'));
+    process.once('SIGTERM', () => void shutdown('SIGTERM'));
   } catch (error) {
     console.error('API startup failed:', error.message);
     process.exit(1);
