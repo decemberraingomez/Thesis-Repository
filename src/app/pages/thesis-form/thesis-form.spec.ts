@@ -6,9 +6,10 @@
 
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
-import { TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { AbstractControl, FormArray, FormGroup } from '@angular/forms';
-import { ActivatedRoute, convertToParamMap, provideRouter } from '@angular/router';
+import { ActivatedRoute, convertToParamMap, provideRouter, Router } from '@angular/router';
+import { vi } from 'vitest';
 import { Thesis } from '../../models/thesis.model';
 import { ThesisForm } from './thesis-form';
 
@@ -26,6 +27,8 @@ const existingThesis: Thesis = {
 
 interface ThesisFormTestApi {
   form: FormGroup;
+  onSubmit(): void;
+  submitting: () => boolean;
 }
 
 const getForm = (component: ThesisForm): FormGroup => {
@@ -33,7 +36,25 @@ const getForm = (component: ThesisForm): FormGroup => {
   return api.form;
 };
 
-const createComponent = (id: string | null): { component: ThesisForm; http: HttpTestingController } => {
+const fillValidForm = (component: ThesisForm): void => {
+  const form = getForm(component);
+  const authors = form.get('authors') as FormArray;
+
+  form.patchValue({
+    title: 'Institutional Academic Repository',
+    abstract: 'A decoupled single-page application for thesis metadata.',
+    adviser: 'Prof. L. Mendoza',
+    year: 2026,
+    category: 'Web & Mobile Development',
+    status: 'Under Review',
+    defenseDate: '2026-11-05',
+  });
+  authors.at(0).setValue('Jim Magnus Andrada');
+};
+
+const createComponent = (
+  id: string | null
+): { component: ThesisForm; http: HttpTestingController; fixture: ComponentFixture<ThesisForm> } => {
   TestBed.configureTestingModule({
     imports: [ThesisForm],
     providers: [
@@ -57,6 +78,7 @@ const createComponent = (id: string | null): { component: ThesisForm; http: Http
   return {
     component: fixture.componentInstance,
     http: TestBed.inject(HttpTestingController),
+    fixture,
   };
 };
 
@@ -119,5 +141,51 @@ describe('ThesisForm', () => {
     expect(authors.at(0).value).toBe('Kirk Romero');
 
     http.verify();
+  });
+
+  it('does not redirect when the component is destroyed while a save is in flight', () => {
+    const { component, http, fixture } = createComponent(null);
+    const router = TestBed.inject(Router);
+    const navigateSpy = vi.spyOn(router, 'navigate').mockResolvedValue(true);
+
+    fillValidForm(component);
+    (component as unknown as ThesisFormTestApi).onSubmit();
+
+    const request = http.expectOne('http://localhost:3000/api/theses');
+    expect(request.request.method).toBe('POST');
+
+    fixture.destroy();
+
+    vi.useFakeTimers();
+
+    try {
+      request.flush(existingThesis);
+      vi.advanceTimersByTime(2500);
+    } finally {
+      vi.useRealTimers();
+    }
+
+    expect(navigateSpy).not.toHaveBeenCalled();
+    http.verify();
+  });
+
+  it('does not create a duplicate record when submit is triggered again during the redirect delay', () => {
+    const { component, http, fixture } = createComponent(null);
+    const api = component as unknown as ThesisFormTestApi;
+
+    fillValidForm(component);
+    api.onSubmit();
+
+    const request = http.expectOne('http://localhost:3000/api/theses');
+    request.flush(existingThesis);
+
+    expect(api.submitting()).toBe(true);
+
+    api.onSubmit();
+
+    http.expectNone('http://localhost:3000/api/theses');
+    http.verify();
+
+    fixture.destroy();
   });
 });

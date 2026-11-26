@@ -44,9 +44,12 @@ export class ThesisForm implements OnInit {
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
   private redirectTimer: number | null = null;
+  private isDestroyed = false;
 
   constructor() {
     this.destroyRef.onDestroy(() => {
+      this.isDestroyed = true;
+
       if (this.redirectTimer !== null) {
         window.clearTimeout(this.redirectTimer);
         this.redirectTimer = null;
@@ -160,6 +163,10 @@ export class ThesisForm implements OnInit {
   }
 
   protected onSubmit(): void {
+    if (this.submitting()) {
+      return;
+    }
+
     this.errorMessage.set('');
     this.successMessage.set('');
     this.serverErrors.set([]);
@@ -191,7 +198,10 @@ export class ThesisForm implements OnInit {
 
     request.subscribe({
       next: (thesis) => {
-        this.submitting.set(false);
+        if (this.isDestroyed) {
+          return;
+        }
+
         const message = id
           ? 'Thesis updated successfully. Changes have been saved.'
           : 'Thesis created successfully. The record has been saved.';
@@ -205,6 +215,11 @@ export class ThesisForm implements OnInit {
 
         this.redirectTimer = window.setTimeout(() => {
           this.redirectTimer = null;
+
+          if (this.isDestroyed) {
+            return;
+          }
+
           void this.router.navigate(destination);
         }, SUCCESS_REDIRECT_DELAY_MS);
       },

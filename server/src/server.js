@@ -64,21 +64,44 @@ const startServer = async () => {
 
     const server = app.listen(port, () => console.log(`API running on port ${port}`));
 
+    let isShuttingDown = false;
+
     const shutdown = async (signal) => {
+      if (isShuttingDown) {
+        console.log(`${signal} received, shutdown already in progress`);
+        return;
+      }
+
+      isShuttingDown = true;
       console.log(`${signal} received, shutting down gracefully`);
 
       const forceExit = setTimeout(() => process.exit(1), 10000);
       forceExit.unref();
 
-      server.close(async () => {
-        await mongoose.disconnect().catch(() => undefined);
-        clearTimeout(forceExit);
-        process.exit(0);
+      server.close((err) => {
+        if (err) {
+          console.error('Error while closing the HTTP server:', err.message);
+          clearTimeout(forceExit);
+          process.exit(1);
+          return;
+        }
+
+        mongoose
+          .disconnect()
+          .catch(() => undefined)
+          .finally(() => {
+            clearTimeout(forceExit);
+            process.exit(0);
+          });
       });
+
+      if (typeof server.closeIdleConnections === 'function') {
+        server.closeIdleConnections();
+      }
     };
 
-    process.once('SIGINT', () => void shutdown('SIGINT'));
-    process.once('SIGTERM', () => void shutdown('SIGTERM'));
+    process.on('SIGINT', () => void shutdown('SIGINT'));
+    process.on('SIGTERM', () => void shutdown('SIGTERM'));
   } catch (error) {
     console.error('API startup failed:', error.message);
     process.exit(1);
