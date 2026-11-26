@@ -4,6 +4,12 @@
  * Assignment Title: CSAPPD1 Final Project - Thesis Repository Search Engine
  */
 
+:host {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+}
+
 .not-found {
   display: flex;
   flex: 1;
