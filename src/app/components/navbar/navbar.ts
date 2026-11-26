@@ -1,12 +1,14 @@
 /**
  * Author: Andrada, Jim Magnus C.
  * Co-author: Jezreel M. Onos
- * Date: November 24, 2026
+ * Date: November 26, 2026
  * Assignment Title: CSAPPD1 Final Project - Thesis Repository Search Engine
  */
 
-import { Component, inject, signal } from '@angular/core';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { Component, DestroyRef, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { NavigationEnd, Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { filter } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
 import { ChangePassword } from '../change-password/change-password';
 
@@ -17,9 +19,21 @@ import { ChangePassword } from '../change-password/change-password';
   styleUrl: './navbar.css',
 })
 export class Navbar {
+  private readonly router = inject(Router);
+  private readonly destroyRef = inject(DestroyRef);
+
   protected readonly authService = inject(AuthService);
   protected readonly passwordDialogOpen = signal(false);
   protected readonly menuOpen = signal(false);
+
+  constructor() {
+    this.router.events
+      .pipe(
+        filter((event): event is NavigationEnd => event instanceof NavigationEnd),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe(() => this.closeMenu());
+  }
 
   protected toggleMenu(): void {
     this.menuOpen.update((open) => !open);
