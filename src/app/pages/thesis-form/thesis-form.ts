@@ -1,10 +1,10 @@
 /**
  * Author: Jezreel M. Onos
- * Date: November 19, 2026
+ * Date: November 25, 2026
  * Assignment Title: CSAPPD1 Final Project - Thesis Repository Search Engine
  */
 
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import {
   AbstractControl,
   FormArray,
@@ -42,6 +42,20 @@ export class ThesisForm implements OnInit {
   private readonly referenceService = inject(ExternalReferenceService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly destroyRef = inject(DestroyRef);
+  private redirectTimer: number | null = null;
+  private isDestroyed = false;
+
+  constructor() {
+    this.destroyRef.onDestroy(() => {
+      this.isDestroyed = true;
+
+      if (this.redirectTimer !== null) {
+        window.clearTimeout(this.redirectTimer);
+        this.redirectTimer = null;
+      }
+    });
+  }
 
   protected readonly categories = THESIS_CATEGORIES;
   protected readonly statuses = THESIS_STATUSES;
@@ -149,6 +163,10 @@ export class ThesisForm implements OnInit {
   }
 
   protected onSubmit(): void {
+    if (this.submitting()) {
+      return;
+    }
+
     this.errorMessage.set('');
     this.successMessage.set('');
     this.serverErrors.set([]);
@@ -180,14 +198,28 @@ export class ThesisForm implements OnInit {
 
     request.subscribe({
       next: (thesis) => {
-        this.submitting.set(false);
+        if (this.isDestroyed) {
+          return;
+        }
+
         const message = id
           ? 'Thesis updated successfully. Changes have been saved.'
           : 'Thesis created successfully. The record has been saved.';
         this.successMessage.set(message);
         const targetId = thesis._id ?? id;
         const destination = targetId ? ['/theses', targetId] : ['/theses'];
-        window.setTimeout(() => {
+
+        if (this.redirectTimer !== null) {
+          window.clearTimeout(this.redirectTimer);
+        }
+
+        this.redirectTimer = window.setTimeout(() => {
+          this.redirectTimer = null;
+
+          if (this.isDestroyed) {
+            return;
+          }
+
           void this.router.navigate(destination);
         }, SUCCESS_REDIRECT_DELAY_MS);
       },

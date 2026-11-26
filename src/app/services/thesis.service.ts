@@ -1,6 +1,6 @@
 /**
  * Author: Jezreel M. Onos
- * Date: November 18, 2026
+ * Date: November 25, 2026
  * Assignment Title: CSAPPD1 Final Project - Thesis Repository Search Engine
  */
 
@@ -9,10 +9,27 @@ import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Thesis } from '../models/thesis.model';
 
-export const API_BASE_URL =
-  window.location.hostname === 'localhost'
-    ? 'http://localhost:3000/api'
-    : 'https://thesis-repository.onrender.com/api';
+const LOCAL_API_BASE_URL = 'http://localhost:3000/api';
+const PRODUCTION_API_BASE_URL = 'https://thesis-repository.onrender.com/api';
+
+const PRODUCTION_HOSTNAMES = ['thesis-repository.vercel.app'];
+const PRODUCTION_HOSTNAME_SUFFIXES = ['.vercel.app'];
+
+const isProductionHostname = (hostname: string): boolean =>
+  PRODUCTION_HOSTNAMES.includes(hostname) ||
+  PRODUCTION_HOSTNAME_SUFFIXES.some((suffix) => hostname.endsWith(suffix));
+
+export const resolveApiBaseUrl = (hostname?: string): string => {
+  if (typeof window === 'undefined') {
+    return LOCAL_API_BASE_URL;
+  }
+
+  const resolvedHostname = hostname ?? window.location.hostname;
+
+  return isProductionHostname(resolvedHostname) ? PRODUCTION_API_BASE_URL : LOCAL_API_BASE_URL;
+};
+
+export const API_BASE_URL = resolveApiBaseUrl();
 
 export interface ThesisInput {
   title: string;

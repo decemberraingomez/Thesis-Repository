@@ -135,6 +135,20 @@ Run every command from the **project root**, not from inside `server/`.
 
    Open `http://localhost:4200/`.
 
+## Quality checks
+
+Run these from the project root before opening a pull request:
+
+```bash
+npm run build:backend        # compile the Mongoose models and seed script
+npm run build                # production Angular build
+npm test -- --watch=false    # Angular unit/component tests
+npm run test:server          # token signing/verification unit tests
+```
+
+The API listens on `PORT` from `.env` (defaults to `3000`). Render injects its own
+`PORT` value at deploy time, so no code change is needed between local and production.
+
 ## API endpoints
 
 | Method | Endpoint | Access | Success | Errors |

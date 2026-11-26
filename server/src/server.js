@@ -1,6 +1,6 @@
 /**
  * Author: Jezreel M. Onos
- * Date: November 23, 2026
+ * Date: November 25, 2026
  * Assignment Title: CSAPPD1 Final Project - Thesis Repository Search Engine
  */
 
@@ -62,7 +62,46 @@ const startServer = async () => {
       console.log('AdminUser collection already has an administrator');
     }
 
-    app.listen(port, () => console.log(`API running on port ${port}`));
+    const server = app.listen(port, () => console.log(`API running on port ${port}`));
+
+    let isShuttingDown = false;
+
+    const shutdown = async (signal) => {
+      if (isShuttingDown) {
+        console.log(`${signal} received, shutdown already in progress`);
+        return;
+      }
+
+      isShuttingDown = true;
+      console.log(`${signal} received, shutting down gracefully`);
+
+      const forceExit = setTimeout(() => process.exit(1), 10000);
+      forceExit.unref();
+
+      server.close((err) => {
+        if (err) {
+          console.error('Error while closing the HTTP server:', err.message);
+          clearTimeout(forceExit);
+          process.exit(1);
+          return;
+        }
+
+        mongoose
+          .disconnect()
+          .catch(() => undefined)
+          .finally(() => {
+            clearTimeout(forceExit);
+            process.exit(0);
+          });
+      });
+
+      if (typeof server.closeIdleConnections === 'function') {
+        server.closeIdleConnections();
+      }
+    };
+
+    process.on('SIGINT', () => void shutdown('SIGINT'));
+    process.on('SIGTERM', () => void shutdown('SIGTERM'));
   } catch (error) {
     console.error('API startup failed:', error.message);
     process.exit(1);

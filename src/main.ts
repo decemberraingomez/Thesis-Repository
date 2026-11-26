@@ -1,7 +1,7 @@
 /**
  * Author: Jezreel M. Onos
  * Date: November 15, 2026
- * Assignment Title: CSAPPD1 Final Project - Thesis Repository
+ * Assignment Title: CSAPPD1 Final Project - Thesis Repository Search Engine
  */
 
 import { bootstrapApplication } from '@angular/platform-browser';

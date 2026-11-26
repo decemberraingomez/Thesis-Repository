@@ -8,7 +8,7 @@ import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { Thesis } from '../models/thesis.model';
-import { API_BASE_URL, ThesisInput, ThesisService } from './thesis.service';
+import { API_BASE_URL, resolveApiBaseUrl, ThesisInput, ThesisService } from './thesis.service';
 
 const sampleThesis: Thesis = {
   _id: '65f1d1f1f1f1f1f1f1f1f1f1',
@@ -32,6 +32,30 @@ const samplePayload: ThesisInput = {
   status: sampleThesis.status,
   defenseDate: sampleThesis.defenseDate as string,
 };
+
+describe('resolveApiBaseUrl', () => {
+  const localApi = 'http://localhost:3000/api';
+  const productionApi = 'https://thesis-repository.onrender.com/api';
+
+  it('uses the local API for loopback, IPv6, LAN, and machine hostnames', () => {
+    ['localhost', '127.0.0.1', '[::1]', '192.168.1.25', 'isen-desktop'].forEach((hostname) => {
+      expect(resolveApiBaseUrl(hostname)).toBe(localApi);
+    });
+  });
+
+  it('uses the production API only for Vercel frontend hostnames', () => {
+    expect(resolveApiBaseUrl('thesis-repository.vercel.app')).toBe(productionApi);
+    expect(
+      resolveApiBaseUrl(
+        'thesis-repository-git-refactor-consolidate-non-8da1d8-rainicie.vercel.app'
+      )
+    ).toBe(productionApi);
+  });
+
+  it('keeps the default test hostname on the local API', () => {
+    expect(API_BASE_URL).toBe(localApi);
+  });
+});
 
 describe('ThesisService', () => {
   let service: ThesisService;
