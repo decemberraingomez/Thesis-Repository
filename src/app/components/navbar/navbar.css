@@ -1,7 +1,7 @@
 /**
  * Author: Andrada, Jim Magnus C.
  * Co-author: Jezreel M. Onos
- * Date: November 24, 2026
+ * Date: November 28, 2026
  * Assignment Title: CSAPPD1 Final Project - Thesis Repository Search Engine
  */
 
@@ -17,21 +17,22 @@
   width: 100%;
   max-width: var(--content-width);
   margin: 0 auto;
-  padding: 0 24px;
+  padding: 0 var(--gutter);
 }
 
 .site-header__inner {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  height: 64px;
+  gap: var(--gutter);
+  min-height: 72px;
 }
 
 .brand {
-  font-size: 15px;
+  margin-right: auto;
+  font-size: 0.9375rem;
   font-weight: 600;
   letter-spacing: -0.01em;
+  white-space: nowrap;
 }
 
 .menu-toggle {
@@ -71,11 +72,11 @@
 .nav {
   display: flex;
   align-items: center;
-  gap: 24px;
+  gap: 1.5rem;
 }
 
 .nav__link {
-  font-size: 14px;
+  font-size: 0.875rem;
   color: var(--muted);
   transition: color 0.15s ease;
 }
@@ -90,7 +91,7 @@
 }
 
 .nav__link--add {
-  color: var(--text);
+  color: var(--accent);
   font-weight: 600;
 }
 
@@ -99,52 +100,73 @@
   border: 0;
   background: transparent;
   font: inherit;
-  font-size: 14px;
+  font-size: 0.875rem;
   cursor: pointer;
 }
 
 .nav__cta {
-  height: 36px;
-  padding: 0 14px;
-  font-size: 13px;
+  min-height: 36px;
+  padding: 0 0.875rem;
+  font-size: 0.8125rem;
 }
 
 .nav__user {
-  font-size: 13px;
+  max-width: 14ch;
+  overflow: hidden;
+  font-size: 0.8125rem;
   color: var(--muted);
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .role-badge {
-  padding: 3px 10px;
-  border: 1px solid #86efac;
-  border-radius: 999px;
-  background: #f0fdf4;
-  color: #166534;
-  font-size: 11px;
+  padding: 0.1875rem 0.5rem;
+  border: 1px solid var(--accent);
+  border-radius: var(--radius);
+  color: var(--accent);
+  font-size: 0.625rem;
   font-weight: 600;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
+/* Theme toggle sits outside .nav so it stays reachable at any width. */
+.theme-toggle {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.theme-toggle:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
 .notice {
-  padding-bottom: 12px;
+  padding-bottom: 0.75rem;
 }
 
 .alert {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  padding: 12px 14px;
-  border: 1px solid var(--border);
+  gap: 0.75rem;
+  padding: 0.75rem 0.875rem;
+  border: 1px solid var(--danger-border);
   border-radius: var(--radius);
-  font-size: 13px;
-}
-
-.alert--error {
-  border-color: #fca5a5;
-  background: #fef2f2;
-  color: #991b1b;
+  background: var(--danger-bg);
+  color: var(--danger-text);
+  font-size: 0.8125rem;
 }
 
 .alert__dismiss {
@@ -152,13 +174,13 @@
   background: transparent;
   color: inherit;
   font: inherit;
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 600;
   text-decoration: underline;
   cursor: pointer;
 }
 
-@media (max-width: 720px) {
+@media (max-width: 860px) {
   .menu-toggle {
     display: flex;
   }
@@ -191,7 +213,7 @@
 
   .nav__user {
     padding: 10px 0 4px;
-    font-size: 13px;
+    font-size: 0.8125rem;
   }
 
   .role-badge {
@@ -200,7 +222,21 @@
   }
 
   .nav__cta {
-    height: 40px;
+    min-height: 40px;
     margin-top: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .site-header__inner {
+    min-height: 64px;
+  }
+
+  .brand {
+    font-size: 0.875rem;
+  }
+
+  .role-badge {
+    display: none;
   }
 }

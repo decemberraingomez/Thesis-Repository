@@ -1,17 +1,90 @@
 /**
- * Author: Jezreel M. Onos
- * Date: November 15, 2026
+ * Author: Andrada, Jim Magnus C.
+ * Date: November 28, 2026
  * Assignment Title: CSAPPD1 Final Project - Thesis Repository Search Engine
+ *
+ * Design system adapted from IDEO (ideo.com/thinking): near-black surface,
+ * hairline borders, zero radius, acid-lime accent, large light-weight display type.
+ * FHOscar is licensed and not bundled; the character is reproduced with weight and
+ * letter-spacing on the system font stack.
  */
 
+/* Primitives — identical in both themes. */
 :root {
-  --bg: #ffffff;
-  --surface: #f7f7f8;
-  --border: #e4e4e7;
-  --text: #18181b;
-  --muted: #71717a;
-  --radius: 8px;
+  --lime: #d9ff00;
+  --ink: #151f27;
+  --slate: #7b92a5;
+  --hairline: #536575;
+  --paper: #ffffff;
+  --gutter: 1.25rem;
   --content-width: 1080px;
+  --measure: 68ch;
+  --radius: 0;
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-display: "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* Light theme — also the no-JS fallback. */
+:root,
+:root[data-theme="light"] {
+  color-scheme: light;
+
+  --bg: #ffffff;
+  --surface: #f4f5f7;
+  --border: #d6dbe0;
+  --text: #151f27;
+  --muted: #536575;
+
+  --accent: #151f27;
+  --on-accent: #d9ff00;
+
+  --btn-bg: #151f27;
+  --btn-text: #ffffff;
+  --btn-hover-bg: #2b3a48;
+  --btn-ghost-border: #d6dbe0;
+  --btn-ghost-hover-border: #151f27;
+
+  --success-bg: #f0fdf4;
+  --success-border: #86efac;
+  --success-text: #166534;
+
+  --danger-bg: #fef2f2;
+  --danger-border: #fca5a5;
+  --danger-text: #991b1b;
+
+  --shadow-overlay: 0 18px 48px rgba(21, 31, 39, 0.18);
+  --backdrop: rgba(21, 31, 39, 0.45);
+}
+
+/* Dark theme — IDEO's own palette. */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --bg: #151f27;
+  --surface: #1c2833;
+  --border: #536575;
+  --text: #ffffff;
+  --muted: #7b92a5;
+
+  --accent: #d9ff00;
+  --on-accent: #151f27;
+
+  --btn-bg: #d9ff00;
+  --btn-text: #151f27;
+  --btn-hover-bg: #ffffff;
+  --btn-ghost-border: #536575;
+  --btn-ghost-hover-border: #7b92a5;
+
+  --success-bg: #16281c;
+  --success-border: #2f6b45;
+  --success-text: #86efac;
+
+  --danger-bg: #2b1616;
+  --danger-border: #7f3a3a;
+  --danger-text: #fca5a5;
+
+  --shadow-overlay: 0 18px 48px rgba(0, 0, 0, 0.55);
+  --backdrop: rgba(6, 10, 14, 0.72);
 }
 
 * {
@@ -27,11 +100,12 @@ body {
   margin: 0;
   background: var(--bg);
   color: var(--text);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-family: var(--font-sans);
   font-size: 16px;
   line-height: 1.55;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 a {
@@ -39,56 +113,240 @@ a {
   text-decoration: none;
 }
 
+::selection {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+/* ---------- Typography ---------- */
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  font-weight: 300;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+}
+
+.display-1 {
+  font-size: clamp(2.5rem, 7vw, 5.625rem);
+  font-weight: 300;
+  line-height: 0.98;
+  letter-spacing: -0.03em;
+}
+
+.display-2 {
+  font-size: clamp(2rem, 5vw, 3.75rem);
+  font-weight: 300;
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+}
+
+.eyebrow {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* ---------- Focus ---------- */
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* ---------- Buttons ---------- */
+
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  height: 44px;
-  padding: 0 20px;
-  border: 1px solid var(--text);
+  gap: 0.75rem;
+  min-height: 44px;
+  padding: 0 var(--gutter);
+  border: 1px solid var(--btn-bg);
   border-radius: var(--radius);
-  background: var(--text);
-  color: #ffffff;
+  background: var(--btn-bg);
+  color: var(--btn-text);
   font: inherit;
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 500;
+  letter-spacing: 0.01em;
   cursor: pointer;
-  transition: opacity 0.15s ease, border-color 0.15s ease;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
 }
 
 .btn:hover {
-  opacity: 0.85;
+  background: var(--btn-hover-bg);
+  border-color: var(--btn-hover-bg);
 }
 
 .btn--ghost {
   background: transparent;
   color: var(--text);
-  border-color: var(--border);
+  border-color: var(--btn-ghost-border);
 }
 
 .btn--ghost:hover {
-  opacity: 1;
-  border-color: var(--text);
+  background: transparent;
+  border-color: var(--btn-ghost-hover-border);
 }
+
+.btn--danger {
+  background: transparent;
+  color: var(--danger-text);
+  border-color: var(--danger-border);
+}
+
+.btn--danger:hover {
+  background: var(--danger-bg);
+  border-color: var(--danger-text);
+}
+
+.btn--small {
+  min-height: 36px;
+  padding: 0 0.875rem;
+  font-size: 0.8125rem;
+}
+
+.btn--arrow {
+  border: 0;
+  background: transparent;
+  color: var(--accent);
+  padding: 0;
+  min-height: auto;
+  font-weight: 500;
+}
+
+.btn--arrow:hover {
+  background: transparent;
+  box-shadow: 0 2px 0 -1px var(--accent);
+}
+
+.btn--arrow .btn__arrow {
+  display: inline-flex;
+  transition: transform 0.2s ease;
+}
+
+.btn--arrow:hover .btn__arrow {
+  transform: translateX(4px);
+}
+
+/* ---------- Inputs ---------- */
 
 .input {
   width: 100%;
-  height: 44px;
-  padding: 0 14px;
+  min-height: 44px;
+  padding: 0.625rem 1rem;
   border: 1px solid var(--border);
   border-radius: var(--radius);
   background: var(--bg);
   color: var(--text);
   font: inherit;
-  font-size: 14px;
+  font-size: 0.875rem;
   transition: border-color 0.15s ease;
+}
+
+.input:hover {
+  border-color: var(--btn-ghost-hover-border);
 }
 
 .input:focus {
   outline: none;
-  border-color: var(--text);
+  border-color: var(--accent);
 }
 
 .input::placeholder {
   color: var(--muted);
+}
+
+.input--invalid {
+  border-color: var(--danger-border);
+}
+
+textarea.input {
+  min-height: 160px;
+  padding: 0.75rem 1rem;
+  resize: vertical;
+  line-height: 1.55;
+}
+
+/* ---------- Field ---------- */
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.field__label {
+  font-size: 0.8125rem;
+  font-weight: 500;
+}
+
+.field__error {
+  font-size: 0.75rem;
+  color: var(--danger-text);
+}
+
+.required {
+  color: var(--danger-text);
+}
+
+/* ---------- Panel ---------- */
+
+.panel {
+  padding: var(--gutter);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.panel__title {
+  margin: 0 0 var(--gutter);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* ---------- Badge ---------- */
+
+.badge {
+  display: inline-block;
+  padding: 0.1875rem 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 0.6875rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* ---------- Alert ---------- */
+
+.alert {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.875rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 0.875rem;
+}
+
+.alert--success {
+  border-color: var(--success-border);
+  background: var(--success-bg);
+  color: var(--success-text);
+}
+
+.alert--error {
+  border-color: var(--danger-border);
+  background: var(--danger-bg);
+  color: var(--danger-text);
 }
