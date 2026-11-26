@@ -1,6 +1,6 @@
 /**
  * Author: Jezreel M. Onos
- * Date: November 18, 2026
+ * Date: November 26, 2026
  * Assignment Title: CSAPPD1 Final Project - Thesis Repository Search Engine
  */
 
@@ -10,38 +10,59 @@
   flex-direction: column;
 }
 
+.container {
+  width: 100%;
+  max-width: var(--content-width);
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+}
+
 .not-found {
   display: flex;
   flex: 1;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 64px 24px;
+  padding-top: clamp(3rem, 10vw, 6rem);
+  padding-bottom: clamp(3rem, 10vw, 6rem);
   text-align: center;
 }
 
 .not-found__code {
   margin: 0;
-  color: var(--muted);
-  font-size: 14px;
-  font-weight: 600;
-  letter-spacing: 0.12em;
+  padding: 0.25rem 0.625rem;
+  border: 2px solid var(--border);
+  border-radius: 3px;
+  background: var(--highlight);
+  color: #000;
+  font-size: 0.75rem;
+  font-weight: 900;
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
 }
 
 .not-found__title {
-  margin: 12px 0 8px;
-  font-size: 32px;
+  max-width: 16ch;
+  margin: 1rem 0 0;
+  font-size: clamp(2.5rem, 7vw, 4rem);
+  font-weight: 900;
+  line-height: 0.95;
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
 }
 
 .not-found__text {
-  max-width: 420px;
-  margin: 0 0 24px;
+  max-width: 42ch;
+  margin: 1rem 0 0;
   color: var(--muted);
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.5;
 }
 
 .not-found__actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
-  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
 }

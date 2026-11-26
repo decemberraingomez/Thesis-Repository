@@ -1,6 +1,6 @@
 /**
  * Author: Andrada, Jim Magnus C.
- * Date: November 24, 2026
+ * Date: November 28, 2026
  * Assignment Title: CSAPPD1 Final Project - Thesis Repository Search Engine
  */
 
@@ -14,7 +14,7 @@
   width: 100%;
   max-width: var(--content-width);
   margin: 0 auto;
-  padding: 0 24px;
+  padding: 0 var(--gutter);
 }
 
 .shell {
@@ -24,24 +24,45 @@
 }
 
 .site-footer {
-  border-top: 1px solid var(--border);
+  border-top: 4px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
 }
 
 .site-footer__inner {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 64px;
-  font-size: 13px;
-  color: var(--muted);
+  gap: var(--gutter);
+  min-height: 64px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
 }
 
 .site-footer__links {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: var(--gutter);
+}
+
+.site-footer__link {
+  padding: 0.125rem 0;
+  color: var(--muted);
+  transition: color 0.15s var(--ease-out);
 }
 
 .site-footer__link:hover {
   color: var(--text);
+  box-shadow: 0 2px 0 -1px var(--border);
+}
+
+@media (max-width: 560px) {
+  .site-footer__inner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 1rem 0;
+  }
 }
