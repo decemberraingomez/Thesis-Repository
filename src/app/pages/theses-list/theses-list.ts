@@ -1,13 +1,13 @@
 /**
  * Author: Jezreel M. Onos
- * Date: November 25, 2026
+ * Date: November 28, 2026
  * Assignment Title: CSAPPD1 Final Project - Thesis Repository Search Engine
  */
 
 import { Component, DestroyRef, computed, inject, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { Subject, debounceTime, distinctUntilChanged, switchMap } from 'rxjs';
+import { EMPTY, Subject, catchError, debounceTime, skip, switchMap } from 'rxjs';
 import { ConfirmDialog } from '../../components/confirm-dialog/confirm-dialog';
 import { ThesisCard } from '../../components/thesis-card/thesis-card';
 import { Thesis, THESIS_CATEGORIES, THESIS_STATUSES } from '../../models/thesis.model';
@@ -43,7 +43,8 @@ export class ThesesList implements OnInit {
   protected readonly pendingDelete = signal<Thesis | null>(null);
   protected readonly deleting = signal(false);
 
-  private readonly searchTerms = new Subject<string>();
+  private readonly searchInput = new Subject<string>();
+  private readonly reload = new Subject<void>();
 
   protected readonly hasFilters = computed(
     () => this.query().trim() !== '' || this.category() !== '' || this.status() !== ''
@@ -58,58 +59,58 @@ export class ThesesList implements OnInit {
   });
 
   constructor() {
-    this.searchTerms
+    this.searchInput
       .pipe(
         debounceTime(SEARCH_DEBOUNCE_MS),
-        distinctUntilChanged(),
-        switchMap((term) => {
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe(() => this.reload.next());
+
+    this.reload
+      .pipe(
+        switchMap(() => {
           this.loading.set(true);
           this.errorMessage.set('');
-          return this.thesisService.getTheses(this.currentQuery(term));
+
+          return this.thesisService.getTheses(this.currentQuery()).pipe(
+            catchError((error: unknown) => {
+              this.loading.set(false);
+              this.errorMessage.set(this.thesisService.describeError(error));
+              return EMPTY;
+            })
+          );
         }),
         takeUntilDestroyed(this.destroyRef)
       )
-      .subscribe({
-        next: (theses) => {
-          this.loading.set(false);
-          this.theses.set(theses);
-        },
-        error: (error: unknown) => {
-          this.loading.set(false);
-          this.errorMessage.set(this.thesisService.describeError(error));
-        },
+      .subscribe((theses) => {
+        this.loading.set(false);
+        this.theses.set(theses);
       });
   }
 
   ngOnInit(): void {
+    const initialTerm = this.route.snapshot.queryParamMap.get('q') ?? '';
+
+    if (initialTerm) {
+      this.query.set(initialTerm);
+    }
+
+    this.loadTheses();
+
     this.route.queryParamMap
-      .pipe(takeUntilDestroyed(this.destroyRef))
+      .pipe(skip(1), takeUntilDestroyed(this.destroyRef))
       .subscribe((params) => {
         const term = params.get('q') ?? '';
 
-        if (term !== this.query()) {
+        if (term !== this.query().trim()) {
           this.query.set(term);
-          this.searchTerms.next(term);
+          this.searchInput.next(term);
         }
       });
-
-    this.loadTheses();
   }
 
   protected loadTheses(): void {
-    this.loading.set(true);
-    this.errorMessage.set('');
-
-    this.thesisService.getTheses(this.currentQuery()).subscribe({
-      next: (theses) => {
-        this.loading.set(false);
-        this.theses.set(theses);
-      },
-      error: (error: unknown) => {
-        this.loading.set(false);
-        this.errorMessage.set(this.thesisService.describeError(error));
-      },
-    });
+    this.reload.next();
   }
 
   protected onSearchInput(event: Event): void {
@@ -118,7 +119,7 @@ export class ThesesList implements OnInit {
     if (target instanceof HTMLInputElement) {
       this.query.set(target.value);
       this.syncUrl();
-      this.searchTerms.next(target.value);
+      this.searchInput.next(target.value);
     }
   }
 
@@ -154,6 +155,7 @@ export class ThesesList implements OnInit {
     this.category.set('');
     this.status.set('');
     this.syncUrl(true);
+    this.searchInput.next('');
     this.loadTheses();
   }
 
@@ -209,9 +211,9 @@ export class ThesesList implements OnInit {
     });
   }
 
-  private currentQuery(term = this.query()) {
+  private currentQuery() {
     return {
-      search: term,
+      search: this.query(),
       category: this.category(),
       status: this.status(),
       sort: this.sort(),

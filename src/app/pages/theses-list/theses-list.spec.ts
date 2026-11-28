@@ -187,4 +187,111 @@ describe('ThesesList', () => {
 
     http.verify();
   });
+
+  it('keeps spaces in the search input while typing', async () => {
+    configure();
+
+    const fixture = TestBed.createComponent(ThesesList);
+    const http = TestBed.inject(HttpTestingController);
+
+    fixture.detectChanges();
+    http.expectOne(`${API_BASE_URL}/theses?sort=newest`).flush([sampleThesis]);
+    fixture.detectChanges();
+
+    const host = fixture.nativeElement as HTMLElement;
+    const searchInput = host.querySelector<HTMLInputElement>('input[type="search"]')!;
+
+    searchInput.value = 'machine l';
+    searchInput.dispatchEvent(new Event('input'));
+    fixture.detectChanges();
+
+    await new Promise((resolve) => setTimeout(resolve, 350));
+    fixture.detectChanges();
+
+    http
+      .expectOne(
+        (req) => req.url === `${API_BASE_URL}/theses` && req.params.get('search') === 'machine l'
+      )
+      .flush([sampleThesis]);
+    fixture.detectChanges();
+
+    expect(searchInput.value).toBe('machine l');
+    http.verify();
+  });
+
+  it('searches again with the same term after clearing filters', async () => {
+    configure();
+
+    const fixture = TestBed.createComponent(ThesesList);
+    const http = TestBed.inject(HttpTestingController);
+
+    fixture.detectChanges();
+    http.expectOne(`${API_BASE_URL}/theses?sort=newest`).flush([sampleThesis]);
+    fixture.detectChanges();
+
+    const host = fixture.nativeElement as HTMLElement;
+    const searchInput = host.querySelector<HTMLInputElement>('input[type="search"]')!;
+
+    searchInput.value = 'index';
+    searchInput.dispatchEvent(new Event('input'));
+    await new Promise((resolve) => setTimeout(resolve, 350));
+    fixture.detectChanges();
+    http
+      .expectOne((req) => req.url === `${API_BASE_URL}/theses` && req.params.get('search') === 'index')
+      .flush([sampleThesis]);
+    fixture.detectChanges();
+
+    host.querySelector<HTMLButtonElement>('.results__clear')?.click();
+    fixture.detectChanges();
+    http
+      .expectOne(
+        (req) => req.url === `${API_BASE_URL}/theses` && !req.params.has('search')
+      )
+      .flush([sampleThesis]);
+    fixture.detectChanges();
+
+    searchInput.value = 'index';
+    searchInput.dispatchEvent(new Event('input'));
+    await new Promise((resolve) => setTimeout(resolve, 350));
+    fixture.detectChanges();
+
+    http
+      .expectOne((req) => req.url === `${API_BASE_URL}/theses` && req.params.get('search') === 'index')
+      .flush([sampleThesis]);
+
+    http.verify();
+  });
+
+  it('keeps searching after a failed request', async () => {
+    configure();
+
+    const fixture = TestBed.createComponent(ThesesList);
+    const http = TestBed.inject(HttpTestingController);
+
+    fixture.detectChanges();
+    http
+      .expectOne(`${API_BASE_URL}/theses?sort=newest`)
+      .flush({ message: 'boom' }, { status: 500, statusText: 'Server Error' });
+    fixture.detectChanges();
+
+    const host = fixture.nativeElement as HTMLElement;
+    expect(host.querySelector('.alert--error')).toBeTruthy();
+
+    const searchInput = host.querySelector<HTMLInputElement>('input[type="search"]')!;
+
+    searchInput.value = 'index';
+    searchInput.dispatchEvent(new Event('input'));
+    await new Promise((resolve) => setTimeout(resolve, 350));
+    fixture.detectChanges();
+
+    const retried = http.expectOne(
+      (req) => req.url === `${API_BASE_URL}/theses` && req.params.get('search') === 'index'
+    );
+    retried.flush([sampleThesis]);
+    fixture.detectChanges();
+
+    expect(host.querySelectorAll('app-thesis-card').length).toBe(1);
+
+    http.verify();
+  });
 });
