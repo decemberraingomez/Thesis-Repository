@@ -1,6 +1,6 @@
 /**
  * Author: Jezreel M. Onos
- * Date: November 18, 2026
+ * Date: November 26, 2026
  * Assignment Title: CSAPPD1 Final Project - Thesis Repository Search Engine
  */
 
@@ -11,8 +11,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 24px;
-  background: rgba(24, 24, 27, 0.45);
+  padding: var(--gutter);
+  background: color-mix(in srgb, var(--bg) 55%, transparent);
+  backdrop-filter: blur(4px);
 }
 
 .dialog-backdrop--busy {
@@ -21,11 +22,13 @@
 
 .dialog {
   width: 100%;
-  padding: 24px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  background: var(--bg);
-  box-shadow: 0 18px 48px rgba(24, 24, 27, 0.18);
+  max-width: 28rem;
+  padding: var(--gutter);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--shadow-xl);
 }
 
 .dialog--busy {
@@ -34,43 +37,47 @@
 
 .dialog__title {
   margin: 0;
-  font-size: 18px;
+  font-size: 1.5rem;
   font-weight: 600;
-  letter-spacing: -0.01em;
+  line-height: 1.05;
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
 }
 
 .dialog__message {
-  margin: 10px 0 0;
+  margin: 0.625rem 0 0;
   color: var(--muted);
-  font-size: 14px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.5;
 }
 
 .dialog__actions {
   display: flex;
   justify-content: flex-end;
-  gap: 8px;
-  margin-top: 24px;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
 }
 
 .dialog__button {
-  height: 40px;
-  font-size: 13px;
+  min-height: 40px;
 }
 
 .dialog__button--danger {
-  border-color: #b91c1c;
-  background: #b91c1c;
+  background: var(--danger-text);
+  color: var(--surface);
+  border-color: var(--danger-text);
 }
 
 .dialog__button--busy {
-  gap: 8px;
+  gap: 0.5rem;
 }
 
 .dialog__spinner {
   width: 13px;
   height: 13px;
-  border: 2px solid rgba(255, 255, 255, 0.5);
-  border-top-color: #ffffff;
+  border: 2px solid rgba(255, 255, 255, 0.45);
+  border-top-color: currentColor;
   border-radius: 50%;
   animation: dialog-spin 0.7s linear infinite;
 }
@@ -78,5 +85,12 @@
 @keyframes dialog-spin {
   to {
     transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dialog__spinner {
+    animation: none;
+    opacity: 0.6;
   }
 }

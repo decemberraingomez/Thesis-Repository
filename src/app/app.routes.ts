@@ -33,10 +33,6 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/thesis-detail/thesis-detail').then((m) => m.ThesisDetail),
   },
   {
-    path: 'search',
-    loadComponent: () => import('./pages/search/search').then((m) => m.Search),
-  },
-  {
     path: 'login',
     loadComponent: () => import('./pages/login/login').then((m) => m.Login),
   },

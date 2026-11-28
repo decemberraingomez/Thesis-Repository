@@ -10,6 +10,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { filter } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
+import { ThemeService } from '../../services/theme.service';
 import { ChangePassword } from '../change-password/change-password';
 
 @Component({
@@ -23,6 +24,7 @@ export class Navbar {
   private readonly destroyRef = inject(DestroyRef);
 
   protected readonly authService = inject(AuthService);
+  protected readonly themeService = inject(ThemeService);
   protected readonly passwordDialogOpen = signal(false);
   protected readonly menuOpen = signal(false);
 
@@ -41,6 +43,10 @@ export class Navbar {
 
   protected closeMenu(): void {
     this.menuOpen.set(false);
+  }
+
+  protected toggleTheme(): void {
+    this.themeService.toggle();
   }
 
   protected openPasswordDialog(): void {

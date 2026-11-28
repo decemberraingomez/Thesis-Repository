@@ -12,12 +12,14 @@
       and search engine architecture.
     </p>
 
-    <form class="search-bar" role="search">
+    <form class="search-bar" role="search" (ngSubmit)="onSearch($event)">
       <input
         class="input search-bar__input"
         type="search"
         placeholder="Search by title, author, or keyword"
         aria-label="Search theses"
+        [value]="query()"
+        (input)="onSearchInput($event)"
       />
       <button class="btn search-bar__button" type="submit">Search</button>
     </form>

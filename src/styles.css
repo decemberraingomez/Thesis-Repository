@@ -1,17 +1,90 @@
 /**
- * Author: Jezreel M. Onos
- * Date: November 15, 2026
+ * Author: Andrada, Jim Magnus C.
+ * Date: November 28, 2026
  * Assignment Title: CSAPPD1 Final Project - Thesis Repository Search Engine
+ *
+ * Design system adapted from uimaven.art (Leila Abbassova's portfolio): neo-brutalist
+ * "sticker" language. Orange chrome, 2px black borders, hard offset shadows with no
+ * blur, uppercase Jost, and hover states that press into the page.
+ * Jost is licensed under the SIL Open Font License and served from Google Fonts.
  */
 
+@import url("https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600;700;900&display=swap");
+
+/* Primitives — identical in both themes. */
 :root {
-  --bg: #ffffff;
-  --surface: #f7f7f8;
-  --border: #e4e4e7;
-  --text: #18181b;
-  --muted: #71717a;
-  --radius: 8px;
-  --content-width: 1080px;
+  --border-w: 2px;
+  --gutter: 1.25rem;
+  --content-width: 1120px;
+  --measure: 68ch;
+  --font-jost: "Jost", "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+  --tracking-wide: 0.025em;
+  --tracking-wider: 0.05em;
+  --tracking-widest: 0.08em;
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+}
+
+/* Light theme — uimaven's default. Also the no-JS fallback. */
+:root,
+:root[data-theme="light"] {
+  color-scheme: light;
+
+  --bg: #f3670e;
+  --surface: #fafafa;
+  --surface-alt: #fbccaf;
+  --border: #000000;
+  --text: #000000;
+  --text-inverse: #fafafa;
+  --muted: #873807;
+
+  --accent: #002af0;
+  --on-accent: #ffffff;
+  --accent-soft: #a5b5ff;
+  --highlight: #ffd31e;
+  --success-fill: #f0fdf4;
+  --success-border: #00b809;
+  --success-text: #004c03;
+  --danger-fill: #fef2f2;
+  --danger-border: #f00c00;
+  --danger-text: #9e0800;
+  --info-fill: #eff6ff;
+  --radius: 6px;
+  --radius-card: 8px;
+  --shadow-sm: 3px 3px 0 var(--border);
+  --shadow-md: 4px 4px 0 var(--border);
+  --shadow-lg: 6px 6px 0 var(--border);
+  --shadow-xl: 8px 8px 0 var(--border);
+}
+
+/* Dark theme — uimaven's product dark mode. */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --bg: #0f0f0f;
+  --surface: #1a1a1a;
+  --surface-alt: #293330;
+  --border: #f3f3f1;
+  --text: #f3f3f1;
+  --text-inverse: #0f0f0f;
+  --muted: #8f8f8f;
+
+  --accent: #4dff52;
+  --on-accent: #0f0f0f;
+  --accent-soft: #293330;
+  --highlight: #f5ff33;
+  --success-fill: #16281c;
+  --success-border: #4dff52;
+  --success-text: #86efac;
+  --danger-fill: #2b1616;
+  --danger-border: #ff7569;
+  --danger-text: #ff8985;
+  --info-fill: #101828;
+  --radius: 6px;
+  --radius-card: 8px;
+  --shadow-sm: 3px 3px 0 var(--border);
+  --shadow-md: 4px 4px 0 var(--border);
+  --shadow-lg: 6px 6px 0 var(--border);
+  --shadow-xl: 8px 8px 0 var(--border);
 }
 
 * {
@@ -27,9 +100,9 @@ body {
   margin: 0;
   background: var(--bg);
   color: var(--text);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-family: var(--font-jost);
   font-size: 16px;
-  line-height: 1.55;
+  line-height: 1.375;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -39,56 +112,282 @@ a {
   text-decoration: none;
 }
 
+::selection {
+  background: var(--highlight);
+  color: #000;
+}
+
+/* ---------- Typography ---------- */
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-jost);
+  font-weight: 900;
+  line-height: 1.05;
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.type-display {
+  font-size: clamp(2.5rem, 7vw, 4rem);
+  font-weight: 900;
+  line-height: 0.95;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
+}
+
+.type-title {
+  font-size: clamp(1.625rem, 4vw, 2.125rem);
+  font-weight: 600;
+  line-height: 1.05;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
+}
+
+.type-heading {
+  font-size: clamp(1.25rem, 2.5vw, 1.5rem);
+  font-weight: 900;
+  line-height: 1.25;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
+}
+
+.type-eyebrow {
+  font-size: 0.875rem;
+  font-weight: 500;
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* ---------- Focus ---------- */
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+/* ---------- Buttons: sticker that presses in ---------- */
+
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  height: 44px;
-  padding: 0 20px;
-  border: 1px solid var(--text);
+  gap: 0.5rem;
+  min-height: 40px;
+  padding: 0 0.875rem;
+  border: var(--border-w) solid var(--border);
   border-radius: var(--radius);
-  background: var(--text);
-  color: #ffffff;
+  background: var(--surface);
+  color: var(--text);
   font: inherit;
-  font-size: 14px;
-  font-weight: 500;
+  font-size: 0.875rem;
+  font-weight: 700;
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  white-space: nowrap;
+  box-shadow: var(--shadow-sm);
   cursor: pointer;
-  transition: opacity 0.15s ease, border-color 0.15s ease;
+  transition: transform 0.15s var(--ease-out), box-shadow 0.15s var(--ease-out),
+    background-color 0.15s var(--ease-out);
 }
 
 .btn:hover {
-  opacity: 0.85;
+  transform: translate(3px, 3px);
+  box-shadow: none;
+}
+
+.btn:active {
+  transform: translate(3px, 3px);
+  box-shadow: none;
+}
+
+.btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btn:disabled:hover {
+  transform: none;
+  box-shadow: var(--shadow-sm);
+}
+
+.btn--primary {
+  background: var(--highlight);
+  color: #000;
 }
 
 .btn--ghost {
   background: transparent;
-  color: var(--text);
-  border-color: var(--border);
 }
 
 .btn--ghost:hover {
-  opacity: 1;
-  border-color: var(--text);
+  background: var(--surface);
 }
+
+.btn--danger {
+  background: var(--danger-fill);
+  color: var(--danger-text);
+  border-color: var(--danger-border);
+}
+
+.btn--danger:hover {
+  transform: translate(3px, 3px);
+  box-shadow: none;
+}
+
+.btn--small {
+  min-height: 32px;
+  padding: 0 0.625rem;
+  font-size: 0.75rem;
+  box-shadow: 2px 2px 0 var(--border);
+}
+
+.btn--small:hover {
+  transform: translate(2px, 2px);
+}
+
+/* ---------- Inputs ---------- */
 
 .input {
   width: 100%;
-  height: 44px;
-  padding: 0 14px;
-  border: 1px solid var(--border);
+  min-height: 40px;
+  padding: 0.5rem 0.625rem;
+  border: var(--border-w) solid var(--border);
   border-radius: var(--radius);
-  background: var(--bg);
+  background: var(--surface);
   color: var(--text);
   font: inherit;
-  font-size: 14px;
-  transition: border-color 0.15s ease;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: border-color 0.15s var(--ease-out);
+}
+
+.input:hover {
+  border-color: var(--accent);
 }
 
 .input:focus {
   outline: none;
-  border-color: var(--text);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent);
 }
 
 .input::placeholder {
   color: var(--muted);
+  font-weight: 400;
+}
+
+.input--invalid {
+  border-color: var(--danger-border);
+}
+
+textarea.input {
+  min-height: 160px;
+  padding: 0.75rem 0.625rem;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+select.input {
+  cursor: pointer;
+  appearance: none;
+  padding-right: 2rem;
+  background-image: linear-gradient(45deg, transparent 50%, currentColor 50%),
+    linear-gradient(135deg, currentColor 50%, transparent 50%);
+  background-position: calc(100% - 15px) 50%, calc(100% - 10px) 50%;
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+}
+
+/* ---------- Field ---------- */
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.field__label {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+}
+
+.field__error {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--danger-text);
+}
+
+.required {
+  color: var(--danger-text);
+}
+
+/* ---------- Panel: flat sticker ---------- */
+
+.panel {
+  padding: var(--gutter);
+  border: var(--border-w) solid var(--border);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  color: var(--text);
+}
+
+.panel__title {
+  margin: 0 0 var(--gutter);
+  font-size: 0.875rem;
+  font-weight: 900;
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* ---------- Badge / chip ---------- */
+
+.badge {
+  display: inline-block;
+  padding: 0.125rem 0.5rem;
+  border: 2px solid var(--border);
+  border-radius: 3px;
+  background: var(--highlight);
+  color: #000;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+}
+
+.badge--status {
+  background: var(--surface);
+  color: var(--text);
+}
+
+/* ---------- Alert ---------- */
+
+.alert {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.75rem 0.875rem;
+  border: var(--border-w) solid var(--border);
+  border-radius: var(--radius);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.alert--success {
+  border-color: var(--success-border);
+  background: var(--success-fill);
+  color: var(--success-text);
+}
+
+.alert--error {
+  border-color: var(--danger-border);
+  background: var(--danger-fill);
+  color: var(--danger-text);
 }
