@@ -1,55 +1,54 @@
 /**
  * Author: Jezreel M. Onos
- * Date: November 19, 2026
+ * Date: November 28, 2026
  * Assignment Title: CSAPPD1 Final Project - Thesis Repository Search Engine
  */
 
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Component, DestroyRef, computed, inject, OnInit, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { EMPTY, Subject, catchError, debounceTime, skip, switchMap } from 'rxjs';
 import { ConfirmDialog } from '../../components/confirm-dialog/confirm-dialog';
-import { Thesis } from '../../models/thesis.model';
+import { ThesisCard } from '../../components/thesis-card/thesis-card';
+import { Thesis, THESIS_CATEGORIES, THESIS_STATUSES } from '../../models/thesis.model';
 import { AuthService } from '../../services/auth.service';
-import { ThesisService } from '../../services/thesis.service';
+import { ThesisService, ThesisSort } from '../../services/thesis.service';
+
+const SEARCH_DEBOUNCE_MS = 300;
 
 @Component({
   selector: 'app-theses-list',
-  imports: [RouterLink, ConfirmDialog],
+  imports: [RouterLink, ConfirmDialog, ThesisCard],
   templateUrl: './theses-list.html',
   styleUrl: './theses-list.css',
 })
 export class ThesesList implements OnInit {
   private readonly thesisService = inject(ThesisService);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+  private readonly destroyRef = inject(DestroyRef);
   protected readonly authService = inject(AuthService);
+
+  protected readonly categories = THESIS_CATEGORIES;
+  protected readonly statuses = THESIS_STATUSES;
 
   protected readonly theses = signal<Thesis[]>([]);
   protected readonly loading = signal(true);
   protected readonly errorMessage = signal('');
   protected readonly successMessage = signal('');
   protected readonly query = signal('');
+  protected readonly category = signal('');
+  protected readonly status = signal('');
+  protected readonly sort = signal<ThesisSort>('newest');
   protected readonly pendingDelete = signal<Thesis | null>(null);
   protected readonly deleting = signal(false);
 
-  protected readonly filteredTheses = computed(() => {
-    const term = this.query().trim().toLowerCase();
+  private readonly searchInput = new Subject<string>();
+  private readonly reload = new Subject<void>();
 
-    if (!term) {
-      return this.theses();
-    }
-
-    return this.theses().filter((thesis) => {
-      const haystack = [
-        thesis.title,
-        thesis.abstract,
-        thesis.adviser,
-        thesis.category,
-        thesis.status,
-        ...thesis.authors,
-      ]
-        .join(' ')
-        .toLowerCase();
-      return haystack.includes(term);
-    });
-  });
+  protected readonly hasFilters = computed(
+    () => this.query().trim() !== '' || this.category() !== '' || this.status() !== ''
+  );
 
   protected readonly deleteDialogOpen = computed(() => this.pendingDelete() !== null);
 
@@ -59,24 +58,59 @@ export class ThesesList implements OnInit {
     return `Delete ${title}? This permanently deletes the record from the repository.`;
   });
 
+  constructor() {
+    this.searchInput
+      .pipe(
+        debounceTime(SEARCH_DEBOUNCE_MS),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe(() => this.reload.next());
+
+    this.reload
+      .pipe(
+        switchMap(() => {
+          this.loading.set(true);
+          this.errorMessage.set('');
+
+          return this.thesisService.getTheses(this.currentQuery()).pipe(
+            catchError((error: unknown) => {
+              this.loading.set(false);
+              this.errorMessage.set(this.thesisService.describeError(error));
+              return EMPTY;
+            })
+          );
+        }),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe((theses) => {
+        this.loading.set(false);
+        this.theses.set(theses);
+      });
+  }
+
   ngOnInit(): void {
+    const initialTerm = this.route.snapshot.queryParamMap.get('q') ?? '';
+
+    if (initialTerm) {
+      this.query.set(initialTerm);
+    }
+
     this.loadTheses();
+
+    this.route.queryParamMap
+      .pipe(skip(1), takeUntilDestroyed(this.destroyRef))
+      .subscribe((params) => {
+        const term = params.get('q') ?? '';
+
+        if (term !== this.query().trim()) {
+          this.query.set(term);
+          this.searchInput.next(term);
+        }
+      });
   }
 
   protected loadTheses(): void {
-    this.loading.set(true);
-    this.errorMessage.set('');
-
-    this.thesisService.getTheses().subscribe({
-      next: (theses) => {
-        this.loading.set(false);
-        this.theses.set(theses);
-      },
-      error: (error: unknown) => {
-        this.loading.set(false);
-        this.errorMessage.set(this.thesisService.describeError(error));
-      },
-    });
+    this.reload.next();
   }
 
   protected onSearchInput(event: Event): void {
@@ -84,7 +118,45 @@ export class ThesesList implements OnInit {
 
     if (target instanceof HTMLInputElement) {
       this.query.set(target.value);
+      this.syncUrl();
+      this.searchInput.next(target.value);
     }
+  }
+
+  protected onCategoryChange(event: Event): void {
+    const target = event.target;
+
+    if (target instanceof HTMLSelectElement) {
+      this.category.set(target.value);
+      this.loadTheses();
+    }
+  }
+
+  protected onStatusChange(event: Event): void {
+    const target = event.target;
+
+    if (target instanceof HTMLSelectElement) {
+      this.status.set(target.value);
+      this.loadTheses();
+    }
+  }
+
+  protected onSortChange(event: Event): void {
+    const target = event.target;
+
+    if (target instanceof HTMLSelectElement) {
+      this.sort.set(target.value as ThesisSort);
+      this.loadTheses();
+    }
+  }
+
+  protected clearFilters(): void {
+    this.query.set('');
+    this.category.set('');
+    this.status.set('');
+    this.syncUrl(true);
+    this.searchInput.next('');
+    this.loadTheses();
   }
 
   protected requestDelete(thesis: Thesis): void {
@@ -139,18 +211,23 @@ export class ThesesList implements OnInit {
     });
   }
 
-  protected formatDate(value: string | Date): string {
-    const date = value instanceof Date ? value : new Date(value);
+  private currentQuery() {
+    return {
+      search: this.query(),
+      category: this.category(),
+      status: this.status(),
+      sort: this.sort(),
+    };
+  }
 
-    if (Number.isNaN(date.getTime())) {
-      return 'Not available';
-    }
+  private syncUrl(clearQuery = false): void {
+    const term = clearQuery ? '' : this.query().trim();
 
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      timeZone: 'UTC',
+    void this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { q: term || null },
+      queryParamsHandling: 'merge',
+      replaceUrl: true,
     });
   }
 }

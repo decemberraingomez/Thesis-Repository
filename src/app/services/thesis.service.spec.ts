@@ -89,6 +89,35 @@ describe('ThesisService', () => {
     expect(result[0].title).toBe(sampleThesis.title);
   });
 
+  it('sends search, filter, and sort options as query parameters', () => {
+    service
+      .getTheses({
+        search: 'indexing',
+        category: 'Software Engineering',
+        status: 'Published',
+        sort: 'title',
+      })
+      .subscribe();
+
+    const request = httpTesting.expectOne(
+      (req) => req.url === `${API_BASE_URL}/theses` && req.params.get('search') === 'indexing'
+    );
+
+    expect(request.request.method).toBe('GET');
+    expect(request.request.params.get('category')).toBe('Software Engineering');
+    expect(request.request.params.get('status')).toBe('Published');
+    expect(request.request.params.get('sort')).toBe('title');
+    request.flush([sampleThesis]);
+  });
+
+  it('omits empty search options from the query string', () => {
+    service.getTheses({ search: '   ', sort: 'newest' }).subscribe();
+
+    const request = httpTesting.expectOne(`${API_BASE_URL}/theses?sort=newest`);
+    expect(request.request.params.has('search')).toBe(false);
+    request.flush([]);
+  });
+
   it('creates a thesis through POST /api/theses', () => {
     let created: Thesis | null = null;
 

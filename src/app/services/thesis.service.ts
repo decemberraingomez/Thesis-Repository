@@ -47,13 +47,49 @@ export interface ApiErrorBody {
   errors?: string[];
 }
 
+export type ThesisSort = 'newest' | 'oldest' | 'title' | 'year';
+
+export interface ThesisQuery {
+  search?: string;
+  category?: string;
+  status?: string;
+  year?: number;
+  sort?: ThesisSort;
+}
+
 @Injectable({ providedIn: 'root' })
 export class ThesisService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = `${API_BASE_URL}/theses`;
 
-  getTheses(): Observable<Thesis[]> {
-    return this.http.get<Thesis[]>(this.baseUrl);
+  getTheses(query: ThesisQuery = {}): Observable<Thesis[]> {
+    return this.http.get<Thesis[]>(this.baseUrl, { params: this.buildParams(query) });
+  }
+
+  private buildParams(query: ThesisQuery): Record<string, string> {
+    const params: Record<string, string> = {};
+
+    if (query.search?.trim()) {
+      params['search'] = query.search.trim();
+    }
+
+    if (query.category) {
+      params['category'] = query.category;
+    }
+
+    if (query.status) {
+      params['status'] = query.status;
+    }
+
+    if (query.year) {
+      params['year'] = String(query.year);
+    }
+
+    if (query.sort) {
+      params['sort'] = query.sort;
+    }
+
+    return params;
   }
 
   getThesis(id: string): Observable<Thesis> {

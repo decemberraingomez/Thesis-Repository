@@ -1,6 +1,6 @@
 <!--
   Author: Jezreel M. Onos
-  Date: November 19, 2026
+  Date: November 25, 2026
   Assignment Title: CSAPPD1 Final Project - Thesis Repository Search Engine
 -->
 
@@ -33,78 +33,104 @@
 
   <div class="toolbar">
     <label class="search">
-      <span class="search__label">Filter records</span>
+      <span class="search__label">Search records</span>
       <input
         class="input"
         type="search"
-        placeholder="Search by title, author, adviser, or category"
+        placeholder="Search by title, abstract, or author"
         [value]="query()"
         (input)="onSearchInput($event)"
       />
     </label>
-    <p class="toolbar__count">
-      {{ filteredTheses().length }} of {{ theses().length }} record{{ theses().length === 1 ? '' : 's' }}
+
+    <div class="filters">
+      <label class="filter">
+        <span class="filter__label">Category</span>
+        <select
+          id="category"
+          class="input filter__select"
+          [value]="category()"
+          (change)="onCategoryChange($event)"
+        >
+          <option value="">All categories</option>
+          @for (option of categories; track option) {
+            <option [value]="option">{{ option }}</option>
+          }
+        </select>
+      </label>
+
+      <label class="filter">
+        <span class="filter__label">Status</span>
+        <select
+          id="status"
+          class="input filter__select"
+          [value]="status()"
+          (change)="onStatusChange($event)"
+        >
+          <option value="">All statuses</option>
+          @for (option of statuses; track option) {
+            <option [value]="option">{{ option }}</option>
+          }
+        </select>
+      </label>
+
+      <label class="filter">
+        <span class="filter__label">Sort</span>
+        <select
+          id="sort"
+          class="input filter__select"
+          [value]="sort()"
+          (change)="onSortChange($event)"
+        >
+          <option value="newest">Newest first</option>
+          <option value="oldest">Oldest first</option>
+          <option value="title">Title A-Z</option>
+          <option value="year">Year descending</option>
+        </select>
+      </label>
+    </div>
+  </div>
+
+  <div class="results">
+    <p class="results__count">
+      {{ theses().length }} record{{ theses().length === 1 ? '' : 's' }}
     </p>
+    @if (hasFilters()) {
+      <button type="button" class="results__clear" (click)="clearFilters()">Clear filters</button>
+    }
   </div>
 
   @if (loading()) {
     <p class="state" role="status">Loading theses from the API...</p>
-  } @else if (filteredTheses().length === 0) {
+  } @else if (theses().length === 0) {
     <div class="empty">
       <p class="empty__title">No thesis records found.</p>
       <p class="empty__text">
-        @if (theses().length === 0) {
-          The repository is empty.@if (authService.isAdmin()) {
+        @if (hasFilters()) {
+          No records match your search. Try a different term or clear the filters.
+        } @else {
+          The repository is empty.
+          @if (authService.isAdmin()) {
             Add your first thesis to get started.
           }
-        } @else {
-          Try a different filter term.
         }
       </p>
-      @if (authService.isAdmin()) {
+      @if (hasFilters()) {
+        <button type="button" class="btn btn--ghost" (click)="clearFilters()">Clear filters</button>
+      } @else if (authService.isAdmin()) {
         <a routerLink="/theses/new" class="btn">Add thesis</a>
       }
     </div>
   } @else {
     <ul class="record-list">
-      @for (thesis of filteredTheses(); track $index) {
-        <li class="record">
-          <div class="record__main">
-            <div class="record__badges">
-              <span class="badge">{{ thesis.category }}</span>
-              <span class="badge badge--status">{{ thesis.status }}</span>
-              <span class="badge">{{ thesis.year }}</span>
-            </div>
-            <h2 class="record__title">
-              <a routerLink="/theses/{{ thesis._id }}" class="record__title-link">
-                {{ thesis.title }}
-              </a>
-            </h2>
-            <p class="record__meta">
-              {{ thesis.authors.join(', ') }} &middot; Adviser: {{ thesis.adviser }}
-            </p>
-            <p class="record__abstract">{{ thesis.abstract }}</p>
-            <p class="record__date">Defended {{ formatDate(thesis.defenseDate) }}</p>
-          </div>
-
-          <div class="record__actions">
-            <a routerLink="/theses/{{ thesis._id }}" class="btn btn--ghost record__button">
-              View
-            </a>
-            @if (authService.isAdmin()) {
-              <a routerLink="/theses/{{ thesis._id }}/edit" class="btn btn--ghost record__button">
-                Edit
-              </a>
-              <button
-                type="button"
-                class="btn btn--ghost btn--danger record__button"
-                [disabled]="deleting()"
-                (click)="requestDelete(thesis)"
-              >
-                Delete
-              </button>
-            }
-          </div>
+      @for (thesis of theses(); track thesis._id) {
+        <li>
+          <app-thesis-card
+            [thesis]="thesis"
+            [canManage]="authService.isAdmin()"
+            [busy]="deleting()"
+            (remove)="requestDelete($event)"
+          />
         </li>
       }
     </ul>
