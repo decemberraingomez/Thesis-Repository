@@ -87,9 +87,21 @@ const validateThesisPayload = (payload, isPartial = false) => {
 
 const sendNotFound = (res) => res.status(404).json({ message: 'Thesis not found' });
 
+const SORT_OPTIONS = {
+  newest: { createdAt: -1 },
+  oldest: { createdAt: 1 },
+  title: { title: 1 },
+  year: { year: -1, createdAt: -1 },
+};
+
+const resolveSort = (value) =>
+  typeof value === 'string' && Object.prototype.hasOwnProperty.call(SORT_OPTIONS, value)
+    ? SORT_OPTIONS[value]
+    : SORT_OPTIONS.newest;
+
 router.get('/', async (req, res, next) => {
   try {
-    const { category, status, year, search } = req.query;
+    const { category, status, year, search, sort } = req.query;
     const filter = {};
 
     if (category) {
@@ -100,8 +112,14 @@ router.get('/', async (req, res, next) => {
       filter.status = status;
     }
 
-    if (year) {
-      filter.year = Number(year);
+    if (year !== undefined && year !== '') {
+      const parsedYear = Number(year);
+
+      if (!Number.isInteger(parsedYear)) {
+        return res.status(400).json({ message: 'Year must be a whole number' });
+      }
+
+      filter.year = parsedYear;
     }
 
     if (search) {
@@ -109,7 +127,9 @@ router.get('/', async (req, res, next) => {
       filter.$or = [{ title: pattern }, { abstract: pattern }, { authors: pattern }];
     }
 
-    const theses = await Thesis.find(filter).sort({ createdAt: -1 });
+    const theses = await Thesis.find(filter)
+      .collation({ locale: 'en', strength: 1 })
+      .sort(resolveSort(sort));
     return res.status(200).json(theses);
   } catch (error) {
     return next(error);

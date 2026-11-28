@@ -1,0 +1,49 @@
+<!--
+  Author: Andrada, Jim Magnus C.
+  Date: November 25, 2026
+  Assignment Title: CSAPPD1 Final Project - Thesis Repository Search Engine
+-->
+
+<article class="card">
+  <div class="card__main">
+    <div class="card__badges">
+      <span class="badge">{{ thesis().category }}</span>
+      <span class="badge badge--status">{{ thesis().status }}</span>
+      <span class="badge">{{ thesis().year }}</span>
+    </div>
+
+    <h2 class="card__title">
+      <a [routerLink]="['/theses', thesis()._id]" class="card__title-link">
+        {{ thesis().title }}
+      </a>
+    </h2>
+
+    <p class="card__meta">
+      {{ thesis().authors.join(', ') }} &middot; Adviser: {{ thesis().adviser }}
+    </p>
+
+    <p class="card__abstract">{{ thesis().abstract }}</p>
+
+    <p class="card__date">Defended {{ formatDate(thesis().defenseDate) }}</p>
+  </div>
+
+  <div class="card__actions">
+    <a [routerLink]="['/theses', thesis()._id]" class="btn btn--ghost card__button">
+      View
+    </a>
+
+    @if (canManage()) {
+      <a [routerLink]="['/theses', thesis()._id, 'edit']" class="btn btn--ghost card__button">
+        Edit
+      </a>
+      <button
+        type="button"
+        class="btn btn--ghost btn--danger card__button"
+        [disabled]="busy()"
+        (click)="requestRemove()"
+      >
+        Delete
+      </button>
+    }
+  </div>
+</article>
